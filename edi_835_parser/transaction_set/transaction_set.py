@@ -85,19 +85,19 @@ class TransactionSet:
 		start_date = None
 		if service.service_period_start:
 			start_date = service.service_period_start.date
-            start_date_type = "service_period"
+			start_date_type = "service_period"
 		elif claim.claim_statement_period_start:
 			start_date = claim.claim_statement_period_start.date
-            start_date_type = "claim_statement"
+			start_date_type = "claim_statement"
 
 		# if the service doesn't have an end date assume the service and claim dates match
 		end_date = None
 		if service.service_period_end:
 			end_date = service.service_period_end.date
-            end_date_type = "service_period"
+			end_date_type = "service_period"
 		elif claim.claim_statement_period_end:
 			end_date = claim.claim_statement_period_end.date
-            end_date_type = "claim_statement"
+			end_date_type = "claim_statement"
 
 		datum = {
 			'marker': claim.claim.marker,
@@ -117,8 +117,8 @@ class TransactionSet:
 			'payer': payer.organization.name,
 			'start_date': start_date,
 			'end_date': end_date,
-            'start_date_type': start_date_type,
-            'end_date_type': end_date_type,
+			'start_date_type': start_date_type,
+			'end_date_type': end_date_type,
 			'rendering_provider': claim.rendering_provider.name if claim.rendering_provider else None,
 			'payer_classification': str(claim.claim.status.payer_classification),
 			'was_forwarded': claim.claim.status.was_forwarded
