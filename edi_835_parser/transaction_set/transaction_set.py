@@ -83,6 +83,7 @@ class TransactionSet:
 	) -> dict:
 		# if the service doesn't have a start date assume the service and claim dates match
 		start_date = None
+		start_date_type = None
 		if service.service_period_start:
 			start_date = service.service_period_start.date
 			start_date_type = "service_period"
@@ -92,6 +93,7 @@ class TransactionSet:
 
 		# if the service doesn't have an end date assume the service and claim dates match
 		end_date = None
+		end_date_type = None
 		if service.service_period_end:
 			end_date = service.service_period_end.date
 			end_date_type = "service_period"
