@@ -95,9 +95,12 @@ class TransactionSet:
 		elif claim.claim_statement_period_end:
 			end_date = claim.claim_statement_period_end.date
 
+
 		datum = {
 			'marker': claim.claim.marker,
 			'patient': claim.patient.name,
+			'id_code_qualifier': claim.patient.identification_code_qualifier,
+			'id_code': claim.patient.identification_code,
 			'code': service.service.code,
 			'modifier': service.service.modifier,
 			'qualifier': service.service.qualifier,
