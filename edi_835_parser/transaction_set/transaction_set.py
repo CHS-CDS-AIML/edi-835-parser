@@ -71,11 +71,8 @@ class TransactionSet:
                     datum[f"rem_{index}_qual"] = remark.qualifier.code
                     datum[f"rem_{index}_code"] = remark.code.code
 
-                for reference in claim.references:
-                    if reference._qualifier.code == "EA":
-                        datum["ea_code"] = reference.value
-
                 data.append(datum)
+        import pdb; pdb.set_trace()
 
         return pd.DataFrame(data)
 
@@ -106,8 +103,14 @@ class TransactionSet:
             end_date = claim.claim_statement_period_end.date
             end_date_type = "claim_statement"
 
+        ea_code = None
+        for reference in claim.references:
+            if reference._qualifier.code == "EA":
+                ea_code = reference.value
+
         datum = {
             "marker": claim.claim.marker,
+            "ea_code": ea_code,
             "patient": claim.patient.name,
             "id_code_qualifier": claim.patient.identification_code_qualifier,
             "id_code": claim.patient.identification_code,
