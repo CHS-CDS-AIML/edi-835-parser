@@ -72,7 +72,6 @@ class TransactionSet:
                     datum[f"rem_{index}_code"] = remark.code.code
 
                 data.append(datum)
-        import pdb; pdb.set_trace()
 
         return pd.DataFrame(data)
 
@@ -103,14 +102,14 @@ class TransactionSet:
             end_date = claim.claim_statement_period_end.date
             end_date_type = "claim_statement"
 
-        ea_code = None
+        ea_codes = list()
         for reference in claim.references:
             if reference._qualifier.code == "EA":
-                ea_code = reference.value
+                ea_codes.append(reference.value)
 
         datum = {
             "marker": claim.claim.marker,
-            "ea_code": ea_code,
+            "patient_identifiers": ea_codes,
             "patient": claim.patient.name,
             "id_code_qualifier": claim.patient.identification_code_qualifier,
             "id_code": claim.patient.identification_code,
@@ -150,9 +149,6 @@ class TransactionSet:
 
         segments = file.split("~")
         segments = [segment.strip() for segment in segments]
-        ea = [i for i in segments if "*EA" in i]
-        #if len(ea) > 0:
-        #    import pdb; pdb.set_trace()
 
         segments = iter(segments)
         segment = None
@@ -212,9 +208,6 @@ class TransactionSet:
 
         elif identifier == ClaimLoop.initiating_identifier:
             claim, segments, segment = ClaimLoop.build(segment, segments)
-            references = [i._qualifier.code for i in claim.references]
-            #if "EA" in references:
-            #    import pdb; pdb.set_trace()
             return BuildAttributeResponse("claim", claim, segment, segments)
 
         else:
