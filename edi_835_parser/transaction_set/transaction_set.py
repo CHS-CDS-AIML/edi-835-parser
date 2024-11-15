@@ -154,6 +154,7 @@ class TransactionSet:
             ),
             "payer_classification": str(claim.claim.status.payer_classification),
             "was_forwarded": claim.claim.status.was_forwarded,
+            "facility_npi": claim.provider_summary[0].value if len(claim.provider_summary) > 0 else None,
         }
 
         return datum
@@ -216,6 +217,7 @@ class TransactionSet:
             ),
             "payer_classification": str(claim.claim.status.payer_classification),
             "was_forwarded": claim.claim.status.was_forwarded,
+            "facility_npi": claim.provider_summary[0].value if len(claim.provider_summary) > 0 else None,
         }
 
         return datum
@@ -227,8 +229,13 @@ class TransactionSet:
         claims = []
         organizations = []
 
-        with open(file_path) as f:
-            file = f.read()
+        try:
+            with open(file_path) as f:
+                file = f.read()
+        except UnicodeDecodeError:
+            print("failed")
+            return None
+            
 
         segments = file.split("~")
         segments = [segment.strip() for segment in segments]
