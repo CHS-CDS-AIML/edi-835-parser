@@ -14,7 +14,10 @@ class Organization:
         segment = split_segment(segment)
 
         self.identifier = segment[0]
-        self.type = segment[1]
+        if segment[1] == "PR":
+            self.type = "payer"
+        elif segment[1] == "PE":
+            self.type = "payee"
         self.name = segment[2]
         try:
             self.id_type = segment[3]

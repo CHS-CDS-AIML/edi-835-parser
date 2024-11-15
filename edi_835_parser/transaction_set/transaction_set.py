@@ -45,7 +45,7 @@ class TransactionSet:
     @property
     def payee(self) -> OrganizationLoop:
         payee = [o for o in self.organizations if o.organization.type == "payee"]
-        assert len(payee) == 1
+        #assert len(payee) == 1
         return payee[0]
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -54,7 +54,7 @@ class TransactionSet:
         for claim in self.claims:
             for service in claim.services:
                 datum = TransactionSet.serialize_service(
-                    self.financial_information, self.payer, claim, service
+                    self.financial_information, self.payer, self.payee, claim, service
                 )
                 datum["loop"] = "service"
 
@@ -75,7 +75,7 @@ class TransactionSet:
 
             if len(claim.services) == 0:
                 datum = TransactionSet.serialize_claim(
-                    self.financial_information, self.payer, claim
+                    self.financial_information, self.payer, self.payee, claim
                 )
                 datum["loop"] = "claim"
 
@@ -107,6 +107,7 @@ class TransactionSet:
     def serialize_claim(
         financial_information: FinancialInformationSegment,
         payer: OrganizationLoop,
+        payee: OrganizationLoop,
         claim: ClaimLoop,
     ) -> dict:
         # if the service doesn't have a start date assume the service and claim dates match
@@ -131,8 +132,8 @@ class TransactionSet:
         # get facility_npi
         if len(claim.provider_summary) > 0:
             facility_npi = claim.provider_summary[0].value
-        elif payer.organization.id_type == "XX":
-            facility_npi = payer.organization.identification_code
+        elif payee.organization.id_type == "XX":
+            facility_npi = payee.organization.identification_code
         else:
             facility_npi = None
 
@@ -171,6 +172,7 @@ class TransactionSet:
     def serialize_service(
         financial_information: FinancialInformationSegment,
         payer: OrganizationLoop,
+        payee: OrganizationLoop,
         claim: ClaimLoop,
         service: ServiceLoop,
     ) -> dict:
@@ -202,8 +204,8 @@ class TransactionSet:
         # get facility_npi
         if len(claim.provider_summary) > 0:
             facility_npi = claim.provider_summary[0].value
-        elif payer.organization.id_type == "XX":
-            facility_npi = payer.organization.identification_code
+        elif payee.organization.id_type == "XX":
+            facility_npi = payee.organization.identification_code
         else:
             facility_npi = None
 
