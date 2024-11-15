@@ -39,7 +39,7 @@ class TransactionSet:
     @property
     def payer(self) -> OrganizationLoop:
         payer = [o for o in self.organizations if o.organization.type == "payer"]
-        assert len(payer) == 1
+        #assert len(payer) == 1
         return payer[0]
 
     @property
@@ -53,10 +53,10 @@ class TransactionSet:
         data = []
         for claim in self.claims:
             for service in claim.services:
-
                 datum = TransactionSet.serialize_service(
                     self.financial_information, self.payer, claim, service
                 )
+                datum["loop"] = "service"
 
                 for index, adjustment in enumerate(service.adjustments):
                     datum[f"adj_{index}_group"] = adjustment.group_code.code
@@ -73,7 +73,90 @@ class TransactionSet:
 
                 data.append(datum)
 
+            if len(claim.services) == 0:
+                datum = TransactionSet.serialize_claim(
+                    self.financial_information, self.payer, claim
+                )
+                datum["loop"] = "claim"
+
+                adjs = list()
+                rems = list()
+                for index, adjustment in enumerate(claim.adjustments):
+                    #TODO: Figure out logic for actually passing in claim codes with amount. Right now just adding the common ones without amounts
+                    adjs.append((adjustment.group_code.code, adjustment.reason_code.code))
+                    #datum[f"adj_{index}_group"] = adjustment.group_code.code
+                    #datum[f"adj_{index}_code"] = adjustment.reason_code.code
+                    #datum[f"adj_{index}_amount"] = adjustment.amount
+                adjs = list(set(adjs))
+                for index, adjustment in enumerate(adjs):
+                    datum[f"adj_{index}_group"] = adjustment[0]
+                    datum[f"adj_{index}_code"] = adjustment[1]
+
+                for index, remark in enumerate(claim.remarks):
+                    rems.append((remark.qualifier.code, remark.code.code))
+                rems = list(set(rems))
+                for index, remark in enumerate(rems):
+                    datum[f"rem_{index}_qual"] = remark[0]
+                    datum[f"rem_{index}_code"] = remark[1]
+
+                data.append(datum)
+
         return pd.DataFrame(data)
+
+    @staticmethod
+    def serialize_claim(
+        financial_information: FinancialInformationSegment,
+        payer: OrganizationLoop,
+        claim: ClaimLoop,
+    ) -> dict:
+        # if the service doesn't have a start date assume the service and claim dates match
+        start_date = None
+        start_date_type = None
+        if claim.claim_statement_period_start:
+            start_date = claim.claim_statement_period_start.date
+            start_date_type = "claim_statement"
+
+        # if the service doesn't have an end date assume the service and claim dates match
+        end_date = None
+        end_date_type = None
+        if claim.claim_statement_period_end:
+            end_date = claim.claim_statement_period_end.date
+            end_date_type = "claim_statement"
+
+        ea_code = None
+        for reference in claim.references:
+            if reference._qualifier.code == "EA":
+                ea_code = reference.value
+
+        datum = {
+            "marker": claim.claim.marker,
+            "patient_identifier": ea_code,
+            "patient": claim.patient.name,
+            "id_code_qualifier": claim.patient.identification_code_qualifier,
+            "id_code": claim.patient.identification_code,
+            "code": None,
+            "modifier": None,
+            "qualifier": None,
+            "allowed_units": None,
+            "billed_units": None,
+            "transaction_date": financial_information.transaction_date,
+            "icn": claim.claim.icn,
+            "charge_amount": claim.claim.charge_amount,
+            "allowed_amount": None,
+            "paid_amount": claim.claim.paid_amount,
+            "payer": payer.organization.name,
+            "start_date": start_date,
+            "end_date": end_date,
+            "start_date_type": start_date_type,
+            "end_date_type": end_date_type,
+            "rendering_provider": (
+                claim.rendering_provider.name if claim.rendering_provider else None
+            ),
+            "payer_classification": str(claim.claim.status.payer_classification),
+            "was_forwarded": claim.claim.status.was_forwarded,
+        }
+
+        return datum
 
     @staticmethod
     def serialize_service(
