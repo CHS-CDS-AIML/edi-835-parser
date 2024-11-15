@@ -117,13 +117,6 @@ class Claim:
                     claim.amount = amount
                     segment = None
 
-                #elif identifier == ServiceAdjustmentSegment.identification:
-                #    claim.adjustments.append(ServiceAdjustmentSegment(segment))
-
-                #elif identifier == RemarkSegment.identification:
-                #    remark = RemarkSegment(segment)
-                #    claim.remarks.append(remark)
-
                 elif identifier in cls.terminating_identifiers:
                     break
                     #return claim, segments, segment
