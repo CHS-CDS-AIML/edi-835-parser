@@ -128,6 +128,14 @@ class TransactionSet:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
 
+        # get facility_npi
+        if len(claim.provider_summary) > 0:
+            facility_npi = claim.provider_summary[0].value
+        elif payer.organization.id_type == "XX":
+            facility_npi = payer.organization.identification_code
+        else:
+            facility_npi = None
+
         datum = {
             "marker": claim.claim.marker,
             "patient_identifier": ea_code,
@@ -154,7 +162,7 @@ class TransactionSet:
             ),
             "payer_classification": str(claim.claim.status.payer_classification),
             "was_forwarded": claim.claim.status.was_forwarded,
-            "facility_npi": claim.provider_summary[0].value if len(claim.provider_summary) > 0 else None,
+            "facility_npi": facility_npi,
         }
 
         return datum
@@ -191,6 +199,14 @@ class TransactionSet:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
 
+        # get facility_npi
+        if len(claim.provider_summary) > 0:
+            facility_npi = claim.provider_summary[0].value
+        elif payer.organization.id_type == "XX":
+            facility_npi = payer.organization.identification_code
+        else:
+            facility_npi = None
+
         datum = {
             "marker": claim.claim.marker,
             "patient_identifier": ea_code,
@@ -217,7 +233,7 @@ class TransactionSet:
             ),
             "payer_classification": str(claim.claim.status.payer_classification),
             "was_forwarded": claim.claim.status.was_forwarded,
-            "facility_npi": claim.provider_summary[0].value if len(claim.provider_summary) > 0 else None,
+            "facility_npi": facility_npi,
         }
 
         return datum
