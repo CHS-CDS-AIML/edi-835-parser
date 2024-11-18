@@ -2,6 +2,7 @@ from edi_835_parser.elements import Element, Code
 
 # https://x12.org/codes/claim-adjustment-reason-codes
 adjustment_reason_codes = {
+    '50': "These are non-covered services because this is not deemed a 'medical necessity",
 	'45': 'Charge exceeds fee schedule maximum allowable or contracted/legislated fee arrangement.',
 	'243': 'Services not authorized by network/primary care providers.',
 	'29': 'The time limit for filing has expired.',

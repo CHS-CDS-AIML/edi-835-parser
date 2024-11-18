@@ -45,7 +45,15 @@ class TransactionSet:
     @property
     def payee(self) -> OrganizationLoop:
         payee = [o for o in self.organizations if o.organization.type == "payee"]
-        #assert len(payee) == 1
+        if len(payee) != 1:
+            payee_list = []
+            for i in payee:
+                facility_npi = i.organization.identification_code
+                payee_list.append(facility_npi)
+            payee_list = list(set(payee_list))
+            # TODO: Determine if we need to handle these somehow
+            #if len(payee_list) > 1:
+            #    pass
         return payee[0]
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -101,7 +109,10 @@ class TransactionSet:
 
                 data.append(datum)
 
-        return pd.DataFrame(data)
+        df = pd.DataFrame(data)
+        df["transmission_date"] = str(self.interchange.transmission_date)
+
+        return df
 
     @staticmethod
     def serialize_claim(

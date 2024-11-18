@@ -3,6 +3,7 @@ from warnings import warn
 
 from edi_835_parser.segments.claim import Claim as ClaimSegment
 from edi_835_parser.segments.entity import Entity as EntitySegment
+from edi_835_parser.segments.provider_summary import ProviderSummary as ProviderSummarySegment
 from edi_835_parser.segments.reference import Reference as ReferenceSegment
 from edi_835_parser.segments.date import Date as DateSegment
 from edi_835_parser.segments.amount import Amount as AmountSegment
@@ -28,6 +29,7 @@ class Claim:
         amount: AmountSegment = None,
         adjustments: List[ServiceAdjustmentSegment] = None,
         remarks: List[RemarkSegment] = None,
+        provider_summary: List[ProviderSummarySegment] = None,
     ):
         self.claim = claim
         self.entities = entities if entities else []
@@ -37,6 +39,7 @@ class Claim:
         self.amount = amount
         self.remarks = remarks if remarks else []
         self.adjustments = adjustments if adjustments else []
+        self.provider_summary = provider_summary if provider_summary else []
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
@@ -115,6 +118,11 @@ class Claim:
                 elif identifier == AmountSegment.identification:
                     amount = AmountSegment(segment)
                     claim.amount = amount
+                    segment = None
+
+                elif identifier == ProviderSummarySegment.identification:
+                    ps = ProviderSummarySegment(segment)
+                    claim.provider_summary.append(ps)
                     segment = None
 
                 elif identifier in cls.terminating_identifiers:
