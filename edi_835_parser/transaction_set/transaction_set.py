@@ -4,6 +4,7 @@ from collections import namedtuple
 import pandas as pd
 
 from edi_835_parser.loops.claim import Claim as ClaimLoop
+from edi_835_parser.loops.payee import Payee as PayeeLoop
 from edi_835_parser.loops.service import Service as ServiceLoop
 from edi_835_parser.loops.organization import Organization as OrganizationLoop
 from edi_835_parser.segments.utilities import find_identifier
@@ -59,6 +60,10 @@ class TransactionSet:
     def to_dataframe(self) -> pd.DataFrame:
         """flatten the remittance advice by service to a pandas DataFrame"""
         data = []
+        payees = [i for i in self.organizations if i.organization.type == "payee"]
+        payers = [i for i in self.organizations if i.organization.type == "payer"]
+        if len(payees) > 1:
+            import pdb; pdb.set_trace()
         for claim in self.claims:
             for service in claim.services:
                 datum = TransactionSet.serialize_service(
@@ -308,6 +313,7 @@ class TransactionSet:
                 return BuildAttributeResponse(None, None, None, None)
 
         identifier = find_identifier(segment)
+        all_sub_segments = segment.split("*")
 
         if identifier == InterchangeSegment.identification:
             interchange = InterchangeSegment(segment)
@@ -320,6 +326,12 @@ class TransactionSet:
             )
 
         if identifier == OrganizationLoop.initiating_identifier:
+            #if all_sub_segments[1] == "PE":
+            #    payee = PayeeLoop.build(segment, segments)
+            #    return BuildAttributeResponse(
+            #            "payee", payee, segment, segments
+            #            )
+            #else:
             organization, segments, segment = OrganizationLoop.build(segment, segments)
             return BuildAttributeResponse(
                 "organization", organization, segment, segments

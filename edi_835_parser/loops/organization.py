@@ -8,6 +8,7 @@ from edi_835_parser.segments.utilities import find_identifier
 
 
 class Organization:
+    # TODO: Put claim loop in here to get correct hierarchy
 	initiating_identifier = OrganizationSegment.identification
 	terminating_identifiers = [
 		ClaimSegment.identification,
