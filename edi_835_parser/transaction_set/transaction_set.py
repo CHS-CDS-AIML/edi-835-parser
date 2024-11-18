@@ -62,7 +62,8 @@ class TransactionSet:
         data = []
         payees = [i for i in self.organizations if i.organization.type == "payee"]
         payers = [i for i in self.organizations if i.organization.type == "payer"]
-        if len(payees) > 1:
+        # TODO: Figure out the hierarchy for organization
+        if len(payees) != len(payers):
             import pdb; pdb.set_trace()
         for claim in self.claims:
             for service in claim.services:
