@@ -4,7 +4,6 @@ from collections import namedtuple
 import pandas as pd
 
 from edi_835_parser.loops.claim import Claim as ClaimLoop
-from edi_835_parser.loops.payee import Payee as PayeeLoop
 from edi_835_parser.loops.service import Service as ServiceLoop
 from edi_835_parser.loops.organization import Organization as OrganizationLoop
 from edi_835_parser.segments.utilities import find_identifier
