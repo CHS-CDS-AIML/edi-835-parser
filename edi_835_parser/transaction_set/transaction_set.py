@@ -37,83 +37,79 @@ class TransactionSet:
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
 
-    @property
-    def payer(self) -> OrganizationLoop:
-        payer = [o for o in self.organizations if o.organization.type == "payer"]
-        #assert len(payer) == 1
-        return payer[0]
+    #@property
+    #def payer(self) -> OrganizationLoop:
+    #    payer = [o for o in self.organizations if o.organization.type == "payer"]
+    #    #assert len(payer) == 1
+    #    return payer[0]
 
-    @property
-    def payee(self) -> OrganizationLoop:
-        payee = [o for o in self.organizations if o.organization.type == "payee"]
-        if len(payee) != 1:
-            payee_list = []
-            for i in payee:
-                facility_npi = i.organization.identification_code
-                payee_list.append(facility_npi)
-            payee_list = list(set(payee_list))
-            # TODO: Determine if we need to handle these somehow
-            #if len(payee_list) > 1:
-            #    pass
-        return payee[0]
+    #@property
+    #def payee(self) -> OrganizationLoop:
+    #    payee = [o for o in self.organizations if o.organization.type == "payee"]
+    #    if len(payee) != 1:
+    #        payee_list = []
+    #        for i in payee:
+    #            facility_npi = i.organization.identification_code
+    #            payee_list.append(facility_npi)
+    #        payee_list = list(set(payee_list))
+    #        # TODO: Determine if we need to handle these somehow
+    #        #if len(payee_list) > 1:
+    #        #    pass
+    #    return payee[0]
 
     def to_dataframe(self) -> pd.DataFrame:
         """flatten the remittance advice by service to a pandas DataFrame"""
         data = []
-        payees = [i for i in self.organizations if i.organization.type == "payee"]
-        payers = [i for i in self.organizations if i.organization.type == "payer"]
-        # TODO: Figure out the hierarchy for organization
-        if len(payees) != len(payers):
-            import pdb; pdb.set_trace()
-        for claim in self.claims:
-            for service in claim.services:
-                datum = TransactionSet.serialize_service(
-                    self.financial_information, self.payer, self.payee, claim, service
-                )
-                datum["loop"] = "service"
+        for org in self.organizations:
+            for claim in org.claims:
+                for service in claim.services:
+                    datum = TransactionSet.serialize_service(
+                        self.financial_information, org, claim, service
+                    )
+                    datum["loop"] = "service"
 
-                for index, adjustment in enumerate(service.adjustments):
-                    datum[f"adj_{index}_group"] = adjustment.group_code.code
-                    datum[f"adj_{index}_code"] = adjustment.reason_code.code
-                    datum[f"adj_{index}_amount"] = adjustment.amount
+                    for index, adjustment in enumerate(service.adjustments):
+                        datum[f"adj_{index}_group"] = adjustment.group_code.code
+                        datum[f"adj_{index}_code"] = adjustment.reason_code.code
+                        datum[f"adj_{index}_amount"] = adjustment.amount
 
-                for index, reference in enumerate(service.references):
-                    datum[f"ref_{index}_qual"] = reference.qualifier.code
-                    datum[f"ref_{index}_value"] = reference.value
+                    for index, reference in enumerate(service.references):
+                        datum[f"ref_{index}_qual"] = reference.qualifier.code
+                        datum[f"ref_{index}_value"] = reference.value
 
-                for index, remark in enumerate(service.remarks):
-                    datum[f"rem_{index}_qual"] = remark.qualifier.code
-                    datum[f"rem_{index}_code"] = remark.code.code
+                    for index, remark in enumerate(service.remarks):
+                        datum[f"rem_{index}_qual"] = remark.qualifier.code
+                        datum[f"rem_{index}_code"] = remark.code.code
 
-                data.append(datum)
+                    data.append(datum)
 
-            if len(claim.services) == 0:
-                datum = TransactionSet.serialize_claim(
-                    self.financial_information, self.payer, self.payee, claim
-                )
-                datum["loop"] = "claim"
+                if len(claim.services) == 0:
+                    datum = TransactionSet.serialize_claim(
+                        self.financial_information, org, claim
+                    )
+                    datum["loop"] = "claim"
 
-                adjs = list()
-                rems = list()
-                for index, adjustment in enumerate(claim.adjustments):
-                    #TODO: Figure out logic for actually passing in claim codes with amount. Right now just adding the common ones without amounts
-                    adjs.append((adjustment.group_code.code, adjustment.reason_code.code))
-                    #datum[f"adj_{index}_group"] = adjustment.group_code.code
-                    #datum[f"adj_{index}_code"] = adjustment.reason_code.code
-                    #datum[f"adj_{index}_amount"] = adjustment.amount
-                adjs = list(set(adjs))
-                for index, adjustment in enumerate(adjs):
-                    datum[f"adj_{index}_group"] = adjustment[0]
-                    datum[f"adj_{index}_code"] = adjustment[1]
+                    adjs = list()
+                    rems = list()
+                    for index, adjustment in enumerate(claim.adjustments):
+                        #TODO: Figure out logic for actually passing in claim codes with amount. Right now just adding the common ones without amounts
+                        adjs.append((adjustment.group_code.code, adjustment.reason_code.code))
+                        #datum[f"adj_{index}_group"] = adjustment.group_code.code
+                        #datum[f"adj_{index}_code"] = adjustment.reason_code.code
+                        #datum[f"adj_{index}_amount"] = adjustment.amount
+                    adjs = list(set(adjs))
+                    for index, adjustment in enumerate(adjs):
+                        datum[f"adj_{index}_group"] = adjustment[0]
+                        datum[f"adj_{index}_code"] = adjustment[1]
 
-                for index, remark in enumerate(claim.remarks):
-                    rems.append((remark.qualifier.code, remark.code.code))
-                rems = list(set(rems))
-                for index, remark in enumerate(rems):
-                    datum[f"rem_{index}_qual"] = remark[0]
-                    datum[f"rem_{index}_code"] = remark[1]
+                    for index, remark in enumerate(claim.remarks):
+                        rems.append((remark.qualifier.code, remark.code.code))
+                    rems = list(set(rems))
+                    for index, remark in enumerate(rems):
+                        datum[f"rem_{index}_qual"] = remark[0]
+                        datum[f"rem_{index}_code"] = remark[1]
 
-                data.append(datum)
+                    data.append(datum)
 
         df = pd.DataFrame(data)
         df["transmission_date"] = str(self.interchange.transmission_date)
@@ -123,8 +119,8 @@ class TransactionSet:
     @staticmethod
     def serialize_claim(
         financial_information: FinancialInformationSegment,
-        payer: OrganizationLoop,
-        payee: OrganizationLoop,
+        organization: OrganizationLoop,
+        #payee: OrganizationLoop,
         claim: ClaimLoop,
     ) -> dict:
         # if the service doesn't have a start date assume the service and claim dates match
@@ -149,8 +145,8 @@ class TransactionSet:
         # get facility_npi
         if len(claim.provider_summary) > 0:
             facility_npi = claim.provider_summary[0].value
-        elif payee.organization.id_type == "XX":
-            facility_npi = payee.organization.identification_code
+        elif organization.payee.id_type == "XX":
+            facility_npi = organization.payee.identification_code
         else:
             facility_npi = None
 
@@ -170,7 +166,7 @@ class TransactionSet:
             "charge_amount": claim.claim.charge_amount,
             "allowed_amount": None,
             "paid_amount": claim.claim.paid_amount,
-            "payer": payer.organization.name,
+            "payer": organization.payer.name,
             "start_date": start_date,
             "end_date": end_date,
             "start_date_type": start_date_type,
@@ -188,8 +184,8 @@ class TransactionSet:
     @staticmethod
     def serialize_service(
         financial_information: FinancialInformationSegment,
-        payer: OrganizationLoop,
-        payee: OrganizationLoop,
+        #payer: OrganizationLoop,
+        organization: OrganizationLoop,
         claim: ClaimLoop,
         service: ServiceLoop,
     ) -> dict:
@@ -221,8 +217,8 @@ class TransactionSet:
         # get facility_npi
         if len(claim.provider_summary) > 0:
             facility_npi = claim.provider_summary[0].value
-        elif payee.organization.id_type == "XX":
-            facility_npi = payee.organization.identification_code
+        elif organization.payee.id_type == "XX":
+            facility_npi = organization.payee.identification_code
         else:
             facility_npi = None
 
@@ -242,7 +238,7 @@ class TransactionSet:
             "charge_amount": service.service.charge_amount,
             "allowed_amount": service.allowed_amount,
             "paid_amount": service.service.paid_amount,
-            "payer": payer.organization.name,
+            "payer": organization.payer.name,
             "start_date": start_date,
             "end_date": end_date,
             "start_date_type": start_date_type,
@@ -327,12 +323,6 @@ class TransactionSet:
             )
 
         if identifier == OrganizationLoop.initiating_identifier:
-            #if all_sub_segments[1] == "PE":
-            #    payee = PayeeLoop.build(segment, segments)
-            #    return BuildAttributeResponse(
-            #            "payee", payee, segment, segments
-            #            )
-            #else:
             organization, segments, segment = OrganizationLoop.build(segment, segments)
             return BuildAttributeResponse(
                 "organization", organization, segment, segments
