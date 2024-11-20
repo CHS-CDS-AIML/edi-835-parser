@@ -11,7 +11,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - '835-parser'
+      - 'edi-parser'
       - '--image'
       - 'us-central1-docker.pkg.dev/prj-cdw-p-clndata-b8df/cloud-run-images/835-parser-image:latest'
       - '--region'
