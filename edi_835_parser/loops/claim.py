@@ -126,37 +126,22 @@ class Claim:
                     claim.provider_summary.append(ps)
                     segment = None
 
+                elif identifier == ServiceAdjustmentSegment.identification:
+                    claim.adjustments.append(ServiceAdjustmentSegment(segment))
+                    segment = None
+
+                elif identifier == RemarkSegment.identification:
+                    remark = RemarkSegment(segment)
+                    claim.remarks.append(remark)
+                    segment = None
+
                 elif identifier in cls.terminating_identifiers:
-                    break
-                    #return claim, segments, segment
+                    return claim, segments, segment
 
                 else:
                     segment = None
                     message = f"Identifier: {identifier} not handled in claim loop."
                     warn(message)
 
-            except StopIteration:
-                return claim, None, None
-
-        if len(claim.services) > 0:
-            return claim, segments, segment
-        # now try to get claim remittance and adjustment codes
-        # reset segments
-        segments = [i for i in segments]
-        segments = iter(segments)
-        while True:
-            try:
-                segment = segments.__next__()
-                identifier = find_identifier(segment)
-
-                if identifier == ServiceAdjustmentSegment.identification:
-                    claim.adjustments.append(ServiceAdjustmentSegment(segment))
-
-                elif identifier == RemarkSegment.identification:
-                    remark = RemarkSegment(segment)
-                    claim.remarks.append(remark)
-
-                elif identifier in cls.terminating_identifiers:
-                    return claim, segments, segment
             except StopIteration:
                 return claim, None, None
