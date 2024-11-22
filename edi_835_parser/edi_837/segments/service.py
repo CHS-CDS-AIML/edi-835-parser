@@ -13,7 +13,7 @@ class ServiceLine:
     Note NTE
 
     """
-    identification = "LX"
+    identification = "SV1"
 
     identifier = Identifier()
     type = ServiceLineType()
@@ -23,15 +23,16 @@ class ServiceLine:
         segment = split_segment(segment)
 
         self.identifier = segment[0]
-        self.type = segment[1]
-        try:
-            self.id_type = segment[3]
-        except:
-            self.id_type = None
-        try:
-            self.identification_code = int(segment[4]) if len(segment) >= 5 else None
-        except:
-            self.identification_code = None
+        self.cpt = segment[1] # CPT code, need to furhter parse
+        self.charge_amount = segment[2]
+        self.measurement = segment[3]
+        self.quantity = segment[4]
+        self.facility_code = segment[5]
+        self.diagnosis_code_pointer = segment[6]
+        #try:
+        #    self.identification_code = int(segment[4]) if len(segment) >= 5 else None
+        #except:
+        #    self.identification_code = None
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())

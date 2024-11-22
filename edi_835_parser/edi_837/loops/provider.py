@@ -7,11 +7,20 @@ from edi_835_parser.edi_837.loops.subscriber import Subscriber as SubscriberLoop
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
+from edi_835_parser.segments.reference import Location as ReferenceSegment
 from edi_835_parser.segments.utilities import find_identifier
+
 
 #name: NameSegment = None # NM1kj
 class Provider:
-    """Class representing 2000A loop of 837"""
+    """Class representing 2000A loop of 837
+
+    Needs
+    address - ok
+    location (n4) - ok
+    ref (ref) - ok
+    contact (PER) - not completed but don't think we need
+    """
     initiating_identifier = ProviderSegment.identification
     terminating_identifiers = [
         ProviderSegment.identification, # PRV
@@ -22,10 +31,14 @@ class Provider:
             provider: ProviderSegment = None # PRV
             address: AddressSegment = None #N3
             subscribers: SubscriberSegment = None #HL
+            location: LocationSegment = None
+            reference: ReferenceSegment = None
             ):
         self.provider = provider
         self.address = address
         self.subscribers = subscribers if subscribers else []
+        self.location = location
+        self.reference reference
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
@@ -56,6 +69,10 @@ class Provider:
 
                 elif identifier == LocationSegment.identification:
                     provider.location = LocationSegment(segment)
+                    segment = None
+
+                elif identifier == ReferenceSegment.identification:
+                    provider.reference = ReferenceSegment(segment)
                     segment = None
                
                 elif identifier in cls.terminating_identifiers:

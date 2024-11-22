@@ -19,12 +19,8 @@ class Claim:
 		segment = split_segment(segment)
 
 		self.identifier = segment[0]
-		self.marker = segment[1]
-		self.status = segment[2]
-		self.charge_amount = segment[3]
-		self.paid_amount = segment[4]
-		self.claim_type = segment[6]
-		self.icn = segment[7]
+        self.claim_amount = segment[1]
+        self.location = segment[2] # place:B:1
 
 	def __repr__(self):
 		return '\n'.join(str(item) for item in self.__dict__.items())

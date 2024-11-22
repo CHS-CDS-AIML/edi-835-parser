@@ -14,6 +14,7 @@ from edi_835_parser.segments.utilities import find_identifier
 class Claim:
     """
     class reprsenting Loop 2300 of 837
+    
     """
     initiating_identifier = ClaimSegment.identification
     terminating_identifiers = [ClaimSegment.identification, 
@@ -28,9 +29,7 @@ class Claim:
         references: List[ReferenceSegment] = None,
         dates: List[DateSegment] = None,
         amount: AmountSegment = None,
-        adjustments: List[ServiceAdjustmentSegment] = None,
-        remarks: List[RemarkSegment] = None,
-        provider_summary: List[ProviderSummarySegment] = None,
+        self.diagnosis_codes = List[DiagnosisCode] = None,
     ):
         self.claim = claim
         self.entities = entities if entities else []
@@ -38,9 +37,7 @@ class Claim:
         self.references = references if references else []
         self.dates = dates if dates else []
         self.amount = amount
-        self.remarks = remarks if remarks else []
-        self.adjustments = adjustments if adjustments else []
-        self.provider_summary = provider_summary if provider_summary else []
+        self.diagnosis_codes = diagnosis_codes if diagnosis_codes else []
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
@@ -49,6 +46,16 @@ class Claim:
     def rendering_provider(self) -> Optional[EntitySegment]:
         rendering_provider = [
             e for e in self.entities if e.entity == "rendering provider"
+        ]
+        assert len(rendering_provider) <= 1
+
+        if len(rendering_provider) == 1:
+            return rendering_provider[0]
+
+    @property
+    def provider(self) -> Optional[EntitySegment]:
+        rendering_provider = [
+            e for e in self.entities if e.entity == "provider" #PRV
         ]
         assert len(rendering_provider) <= 1
 
@@ -119,20 +126,6 @@ class Claim:
                 elif identifier == AmountSegment.identification:
                     amount = AmountSegment(segment)
                     claim.amount = amount
-                    segment = None
-
-                elif identifier == ProviderSummarySegment.identification:
-                    ps = ProviderSummarySegment(segment)
-                    claim.provider_summary.append(ps)
-                    segment = None
-
-                elif identifier == ServiceAdjustmentSegment.identification:
-                    claim.adjustments.append(ServiceAdjustmentSegment(segment))
-                    segment = None
-
-                elif identifier == RemarkSegment.identification:
-                    remark = RemarkSegment(segment)
-                    claim.remarks.append(remark)
                     segment = None
 
                 elif identifier in cls.terminating_identifiers:

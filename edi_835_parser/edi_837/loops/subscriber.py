@@ -10,10 +10,13 @@ from edi_835_parser.edi_837.loops.subscriber import Claim as ClaimLoop
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
+from edi_835_parser.segments.entity import Entity as EntitySegment
 
 #name: NameSegment = None # NM1kj
 class Subscriber:
-    """Class representing 2000A loop of 837"""
+    """Class representing 2000A loop of 837
+    name (NM1) - okay
+    """
     initiating_identifier = SubscriberSegment.identification
     terminating_identifiers = [
         SubscriberSegment.identification, # SBR
@@ -23,10 +26,14 @@ class Subscriber:
             self,
             subscriber: SubscriberSegment = None # SBR
             address: AddressSegment = None #N3
+            location: LocationSegment
             claims: List[ClaimSegment] = None CLM
+            entities: List[EntitySegment] = None,
             ):
         self.subscriber = subscriber
         self.address = address
+        self.location = location
+        self.entities = entities if entities else []
         self.claims = claims if claims else []
 
     def __repr__(self):
@@ -48,9 +55,6 @@ class Subscriber:
                 if identifier == ClaimLoop.initiating_identifier:
                     claim, segments, segment = ClaimLoop.build(segment, segments)
                     subscriber.subscribers.append(claim)
-                    # check if claims has hit end
-                    #if segments == segment == None:
-                    #    raise StopIteration
 
                 elif identifier == AddressSegment.identification:
                     subscriber.address = AddressSegment(segment)
