@@ -7,6 +7,7 @@ class DiagnosisCodes:
     identification = "HI"
 
     identifier = Identifier()
+    diagnosis_codes = DiagnosisCodesElement()
     type = DiagnosisCodesType()
 
     def __init__(self, segment: str):
@@ -14,7 +15,7 @@ class DiagnosisCodes:
         segment = split_segment(segment)
 
         self.identifier = segment[0]
-        self.diagnosis_codes = DiagnosisCodesElement().parser(segment[1])
+        self.diagnosis_codes = segment[1]
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
