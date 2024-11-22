@@ -1,5 +1,5 @@
 from edi_835_parser.elements.identifier import Identifier
-from edi_835_parser.elements.subscriber_type import ServiceLineType
+from edi_835_parser.edi_837.elements.service_type import ServiceLineType
 from edi_835_parser.segments.utilities import split_segment
 
 

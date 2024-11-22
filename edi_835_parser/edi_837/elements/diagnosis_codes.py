@@ -1,10 +1,11 @@
 from edi_835_parser.elements import Element, Code
+from typing import Iterator, Tuple, Optional, List
 
 # import List
-remark_qualifiers = {"HI": "diagnosis codes"}
+diagnosis_codes = {"HI": "diagnosis codes"}
 
 
-class RemarkQualifier(Element):
+class DiagnosisCodes(Element):
     def parser(self, value: str) -> List[Code]:
         splits = value.split()
         codes = list()

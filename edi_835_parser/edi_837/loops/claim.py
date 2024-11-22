@@ -4,11 +4,17 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
+from edi_835_parser.edi_837.segments.service import ServiceLine as ServiceLineSegment
+from edi_835_parser.edi_837.segments.diagnosis_codes import DiagnosisCodes as DiagnosisCodesSegment
 from edi_835_parser.edi_837.loops.service import Service as ServiceLoop
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
+from edi_835_parser.segments.entity import Entity as EntitySegment
+from edi_835_parser.segments.reference import Reference as ReferenceSegment
+from edi_835_parser.segments.date import Date as DateSegment
+from edi_835_parser.segments.amount import Amount as AmountSegment
 
 class Claim:
     """
@@ -17,7 +23,7 @@ class Claim:
     """
     initiating_identifier = ClaimSegment.identification
     terminating_identifiers = [ClaimSegment.identification, 
-            ServiceSegment.identification,
+            ServiceLineSegment.identification,
             "SE"]
 
     def __init__(
@@ -28,7 +34,7 @@ class Claim:
         references: List[ReferenceSegment] = None,
         dates: List[DateSegment] = None,
         amount: AmountSegment = None,
-        diagnosis_codes: List[DiagnosisCode] = None,
+        diagnosis_codes: DiagnosisCodesSegment = None,
     ):
         self.claim = claim
         self.entities = entities if entities else []
@@ -36,7 +42,7 @@ class Claim:
         self.references = references if references else []
         self.dates = dates if dates else []
         self.amount = amount
-        self.diagnosis_codes = diagnosis_codes if diagnosis_codes else []
+        self.diagnosis_codes = diagnosis_codes
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
@@ -115,6 +121,11 @@ class Claim:
                 elif identifier == ReferenceSegment.identification:
                     reference = ReferenceSegment(segment)
                     claim.references.append(reference)
+                    segment = None
+
+                elif identifier == DiagnosisCodesSegment.identification:
+                    diagnosis_codes = DiagnosisCodes(segment)
+                    claim.diagnosis_codes = diagnosis_codes
                     segment = None
 
                 elif identifier == DateSegment.identification:

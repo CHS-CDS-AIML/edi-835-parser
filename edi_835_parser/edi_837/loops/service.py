@@ -4,38 +4,38 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
-from edi_835_parser.edi_837.elements.diagnosis_codes import DiagnosisCode
+from edi_835_parser.edi_837.segments.service import ServiceLine as ServiceLineSegment
 
+from edi_835_parser.segments.date import Date as DateSegment
+from edi_835_parser.segments.amount import Amount as AmountSegment
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
+from edi_835_parser.segments.reference import Reference as ReferenceSegment
+from edi_835_parser.elements.dollars import Dollars
 
 class Service:
     """
     class reprsenting Loop 2400 of 837
     """
-    initiating_identifier = ServiceSegment.identification
+    initiating_identifier = ServiceLineSegment.identification
     terminating_identifiers = [
-        ServiceSegment.identification,
+        ServiceLineSegment.identification,
         ClaimSegment.identification,
         "SE",
     ]
 
     def __init__(
         self,
-        service: ServiceSegment = None,
+        service: ServiceLineSegment = None,
         dates: List[DateSegment] = None,
         references: List[ReferenceSegment] = None,
-        remarks: List[RemarkSegment] = None,
         amount: AmountSegment = None,
-        adjustments: List[ServiceAdjustmentSegment] = None,
     ):
         self.service = service
         self.dates = dates if dates else []
         self.references = references if references else []
-        self.remarks = remarks if remarks else []
         self.amount = amount
-        self.adjustments = adjustments if adjustments else []
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
@@ -83,7 +83,7 @@ class Service:
         cls, segment: str, segments: Iterator[str]
     ) -> Tuple["Service", Optional[str], Optional[Iterator[str]]]:
         service = Service()
-        service.service = ServiceSegment(segment)
+        service.service = ServiceLineSegment(segment)
 
         while True:
             try:
@@ -97,18 +97,11 @@ class Service:
                 elif identifier == AmountSegment.identification:
                     service.amount = AmountSegment(segment)
 
-                elif identifier == RemarkSegment.identification:
-                    remark = RemarkSegment(segment)
-                    service.remarks.append(remark)
-
                 elif identifier == ReferenceSegment.identification:
                     reference = ReferenceSegment(segment)
                     #if "*EA" in segment:
                     #    import pdb; pdb.set_trace()
                     service.references.append(reference)
-
-                elif identifier == ServiceAdjustmentSegment.identification:
-                    service.adjustments.append(ServiceAdjustmentSegment(segment))
 
                 elif identifier in cls.terminating_identifiers:
                     return service, segment, segments

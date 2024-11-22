@@ -7,7 +7,7 @@ from edi_835_parser.edi_837.loops.subscriber import Subscriber as SubscriberLoop
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
-from edi_835_parser.segments.reference import Location as ReferenceSegment
+from edi_835_parser.segments.reference import Reference as ReferenceSegment
 from edi_835_parser.segments.utilities import find_identifier
 
 
@@ -28,17 +28,17 @@ class Provider:
     ]
     def __init__(
             self,
-            provider: ProviderSegment = None # PRV
-            address: AddressSegment = None #N3
-            subscribers: SubscriberSegment = None #HL
-            location: LocationSegment = None
-            reference: ReferenceSegment = None
+            provider: ProviderSegment = None, # PRV
+            address: AddressSegment = None, #N3
+            subscribers: SubscriberSegment = None, #HL
+            location: LocationSegment = None,
+            reference: ReferenceSegment = None,
             ):
         self.provider = provider
         self.address = address
         self.subscribers = subscribers if subscribers else []
         self.location = location
-        self.reference reference
+        self.reference = reference
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
