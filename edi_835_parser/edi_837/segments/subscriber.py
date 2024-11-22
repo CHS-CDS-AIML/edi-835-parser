@@ -19,7 +19,10 @@ class Subscriber:
         if "PAT" in segment:
             import pdb; pdb.set_trace()
         self.identifier = segment[0]
-        self.responsibility = segment[1]# P = Primary, S = SEcondary, T = Tertiary
+        try:
+            self.responsibility = segment[1]# P = Primary, S = SEcondary, T = Tertiary
+        except IndexError:
+            self.responsibility = None
         self.relationship = segment[2] # Client relationship to insured, 01 = Spouse, 18 = self, 19 = child, G8 = other
         self.group_number = segment[3] # Policy/group number
         self.plan = segment[4] # Plan/Program

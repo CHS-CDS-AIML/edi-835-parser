@@ -46,9 +46,10 @@ class TransactionSet:
         data = []
         for provider in self.providers:
             for subscriber in provider.subscribers:
+                if subscriber.subscriber is None:
+                    continue
                 for claim in subscriber.claims:
                     for service in claim.services:
-                        import pdb; pdb.set_trace()
                         datum = TransactionSet.serialize_service(
                             self.financial_information, provider, subscriber, claim, service
                         )
@@ -56,7 +57,7 @@ class TransactionSet:
                         data.append(datum)
 
         df = pd.DataFrame(data)
-        df["transmission_date"] = str(self.interchange.transmission_date)
+        import pdb; pdb.set_trace()
 
         return df
 
@@ -93,20 +94,17 @@ class TransactionSet:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
 
-        # get facility_npi
-        if len(claim.provider_summary) > 0:
-            facility_npi = claim.provider_summary[0].value
-        elif organization.payee.id_type == "XX":
-            facility_npi = organization.payee.identification_code
-        else:
-            facility_npi = None
-
         datum = {
             "billing_id_code": provider.provider.identification_code,
             # Get provider name
             "subscriber_responsibility": subscriber.subscriber.responsibility,
             "subscriber_group_number": subscriber.subscriber.group_number,
             "subscriber_plan": subscriber.subscriber.plan,
+            #subscriber_name": subscriber.patient.name,
+            "claim_identifier": claim.claim.claim_identifier,
+            "claim_amount": claim.claim.claim_amount,
+            "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
+            "charge_amount": service.service.charge_amount,
         }
 
         return datum
