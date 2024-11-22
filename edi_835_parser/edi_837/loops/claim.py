@@ -4,7 +4,7 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
-from edi_835_parser.edi_837.segments.service import ServiceLine as ServiceLineSegment
+from edi_835_parser.edi_837.segments.service import Service as ServiceSegment
 from edi_835_parser.edi_837.segments.diagnosis_codes import DiagnosisCodes as DiagnosisCodesSegment
 from edi_835_parser.edi_837.loops.service import Service as ServiceLoop
 
@@ -23,8 +23,8 @@ class Claim:
     """
     initiating_identifier = ClaimSegment.identification
     terminating_identifiers = [ClaimSegment.identification, 
-            ServiceLineSegment.identification,
             "HL",
+            "SE",
             ]
 
     def __init__(

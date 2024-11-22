@@ -21,7 +21,9 @@ class Subscriber:
     initiating_identifier = HierarchySegment.identification
     terminating_identifiers = [
         ClaimSegment.identification, # CLM
+        HierarchySegment.identification,
         "SE",
+        "IEA",
         ]
     def __init__(
             self,
@@ -53,8 +55,10 @@ class Subscriber:
         segment = segments.__next__()
         while True:
             try:
-                if segment is None:
+                try:
                     segment = segments.__next__()
+                except:
+                    import pdb; pdb.set_trace()
                 identifier = find_identifier(segment)
 
                 if identifier == SubscriberSegment.identification:
@@ -64,6 +68,8 @@ class Subscriber:
                 elif identifier == ClaimLoop.initiating_identifier:
                     claim, segments, segment = ClaimLoop.build(segment, segments)
                     subscriber.claims.append(claim)
+                    if segments == segment == None:
+                        raise StopIteration
 
                 elif identifier == AddressSegment.identification:
                     subscriber.address = AddressSegment(segment)

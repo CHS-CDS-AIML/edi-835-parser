@@ -4,7 +4,8 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
-from edi_835_parser.edi_837.segments.service import ServiceLine as ServiceLineSegment
+from edi_835_parser.edi_837.segments.service_line import ServiceLine as ServiceLineSegment
+from edi_835_parser.edi_837.segments.service import Service as ServiceSegment
 
 from edi_835_parser.segments.date import Date as DateSegment
 from edi_835_parser.segments.amount import Amount as AmountSegment
@@ -22,16 +23,19 @@ class Service:
     terminating_identifiers = [
         ServiceLineSegment.identification,
         ClaimSegment.identification,
+        "HL",
         "SE",
     ]
 
     def __init__(
         self,
-        service: ServiceLineSegment = None,
+        service_line: ServiceLineSegment = None,
+        service: ServiceSegment = None,
         dates: List[DateSegment] = None,
         references: List[ReferenceSegment] = None,
         amount: AmountSegment = None,
     ):
+        self.service_line = service
         self.service = service
         self.dates = dates if dates else []
         self.references = references if references else []
@@ -83,14 +87,18 @@ class Service:
         cls, segment: str, segments: Iterator[str]
     ) -> Tuple["Service", Optional[str], Optional[Iterator[str]]]:
         service = Service()
-        service.service = ServiceLineSegment(segment)
+        service.service_line = ServiceLineSegment(segment)
 
         while True:
             try:
                 segment = segments.__next__()
                 identifier = find_identifier(segment)
 
-                if identifier == DateSegment.identification:
+                if identifier == ServiceSegment.identification:
+                    service_seg = ServiceSegment(segment)
+                    service.service = service_seg
+
+                elif identifier == DateSegment.identification:
                     date = DateSegment(segment)
                     service.dates.append(date)
 

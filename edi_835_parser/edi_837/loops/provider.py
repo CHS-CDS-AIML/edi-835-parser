@@ -24,9 +24,9 @@ class Provider:
     """
     initiating_identifier = HierarchySegment.identification
     terminating_identifiers = [
-        #ProviderSegment.identification, # PRV
         HierarchySegment.identification,
-        "SE"
+        "SE",
+        "IEA",
     ]
     def __init__(
             self,
@@ -71,8 +71,8 @@ class Provider:
                     subscriber, segments, segment = SubscriberLoop.build(segment, segments)
                     provider.subscribers.append(subscriber)
                     # check if claims has hit end
-                    #if segments == segment == None:
-                    #    raise StopIteration
+                    if segments == segment == None:
+                        raise StopIteration
 
                 elif identifier == AddressSegment.identification:
                     provider.address = AddressSegment(segment)
@@ -92,7 +92,7 @@ class Provider:
                         message = f"Identifier: {identifier} not handled in provider loop."
                         warn(message)
                     else:
-                        return organization, segments, segment
+                        return provider, segments, segment
 
                 else:
                     segment = None
@@ -100,7 +100,7 @@ class Provider:
                     warn(message)
 
             except StopIteration:
-                return organization, None, None
+                return provider, None, None
 
 
 if __name__ == "__main__":
