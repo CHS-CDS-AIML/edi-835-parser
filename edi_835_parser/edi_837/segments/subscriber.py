@@ -16,6 +16,8 @@ class Subscriber:
         self.segment = segment
         segment = split_segment(segment)
 
+        if "PAT" in segment:
+            import pdb; pdb.set_trace()
         self.identifier = segment[0]
         self.responsibility = segment[1]# P = Primary, S = SEcondary, T = Tertiary
         self.relationship = segment[2] # Client relationship to insured, 01 = Spouse, 18 = self, 19 = child, G8 = other

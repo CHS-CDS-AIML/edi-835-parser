@@ -24,7 +24,8 @@ class Claim:
     initiating_identifier = ClaimSegment.identification
     terminating_identifiers = [ClaimSegment.identification, 
             ServiceLineSegment.identification,
-            "SE"]
+            "HL",
+            ]
 
     def __init__(
         self,
@@ -87,12 +88,12 @@ class Claim:
         if len(statement_period_end) == 1:
             return statement_period_end[0]
 
-    @property
-    def patient(self) -> EntitySegment:
-        patient = [e for e in self.entities if e.entity == "patient"]
-        assert len(patient) == 1
+    #@property
+    #def patient(self) -> EntitySegment:
+    #    patient = [e for e in self.entities if e.entity == "patient"]
+    #    assert len(patient) == 1
 
-        return patient[0]
+    #    return patient[0]
 
     @classmethod
     def build(

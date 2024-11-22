@@ -4,6 +4,7 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.loops.subscriber import Subscriber as SubscriberLoop
+from edi_835_parser.edi_837.segments.hierarchy import Hierarchy as HierarchySegment
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
@@ -21,20 +22,23 @@ class Provider:
     ref (ref) - ok
     contact (PER) - not completed but don't think we need
     """
-    initiating_identifier = ProviderSegment.identification
+    initiating_identifier = HierarchySegment.identification
     terminating_identifiers = [
-        ProviderSegment.identification, # PRV
-        SubscriberSegment.identification, # SBR
+        #ProviderSegment.identification, # PRV
+        HierarchySegment.identification,
+        "SE"
     ]
     def __init__(
             self,
             provider: ProviderSegment = None, # PRV
+            hierarchy: HierarchySegment = None,
             address: AddressSegment = None, #N3
             subscribers: SubscriberSegment = None, #HL
             location: LocationSegment = None,
             reference: ReferenceSegment = None,
             ):
         self.provider = provider
+        self.hierarchy = hierarchy
         self.address = address
         self.subscribers = subscribers if subscribers else []
         self.location = location
@@ -47,7 +51,7 @@ class Provider:
         cls, current_segment: str, segments: Iterator[str]
     ) -> Tuple["ProviderSegment", Optional[Iterator[str]], Optional[str]]:
         provider = Provider()
-        provider.provider = ProviderSegment(current_segment)
+        provider.hierarchy = HierarchySegment(current_segment)
 
         segment = segments.__next__()
         while True:
@@ -58,8 +62,12 @@ class Provider:
                     except:
                         import pdb; pdb.set_trace()
                 identifier = find_identifier(segment)
+          
+                if identifier == ProviderSegment.identification:
+                    provider.provider = ProviderSegment(segment)
+                    segment = None
 
-                if identifier == SubscriberLoop.initiating_identifier:
+                elif identifier == SubscriberLoop.initiating_identifier:
                     subscriber, segments, segment = SubscriberLoop.build(segment, segments)
                     provider.subscribers.append(subscriber)
                     # check if claims has hit end
@@ -79,7 +87,12 @@ class Provider:
                     segment = None
                
                 elif identifier in cls.terminating_identifiers:
-                    return organization, segments, segment
+                    # TODO: Need to handle PRV segment in Claim (PRV*PE)
+                    if segment.split("*")[1] == "AT":
+                        message = f"Identifier: {identifier} not handled in provider loop."
+                        warn(message)
+                    else:
+                        return organization, segments, segment
 
                 else:
                     segment = None

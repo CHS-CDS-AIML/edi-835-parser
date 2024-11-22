@@ -6,6 +6,7 @@ from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberS
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
 from edi_835_parser.edi_837.segments.demographic import Demographic as DemographicSegment
 from edi_835_parser.edi_837.loops.claim import Claim as ClaimLoop
+from edi_835_parser.edi_837.segments.hierarchy import Hierarchy as HierarchySegment
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
@@ -17,14 +18,15 @@ class Subscriber:
     """Class representing 2000A loop of 837
     name (NM1) - okay
     """
-    initiating_identifier = SubscriberSegment.identification
+    initiating_identifier = HierarchySegment.identification
     terminating_identifiers = [
-        SubscriberSegment.identification, # SBR
-        ClaimSegment.identification # CLM
-    ]
+        ClaimSegment.identification, # CLM
+        "SE",
+        ]
     def __init__(
             self,
             subscriber: SubscriberSegment = None, # SBR
+            hierarchy: HierarchySegment = None,
             address: AddressSegment = None, #N3 
             location: LocationSegment = None,
             demographic: DemographicSegment = None,
@@ -32,6 +34,7 @@ class Subscriber:
             entities: List[EntitySegment] = None,
             ):
         self.subscriber = subscriber
+        self.hierarchy = hierarchy
         self.address = address
         self.location = location
         self.demographic = demographic
@@ -45,7 +48,7 @@ class Subscriber:
         cls, current_segment: str, segments: Iterator[str]
     ) -> Tuple["SubscriberSegment", Optional[Iterator[str]], Optional[str]]:
         subscriber = Subscriber()
-        subscriber.subscriber = SubscriberSegment(current_segment)
+        subscriber.hierarchy = HierarchySegment(current_segment)
 
         segment = segments.__next__()
         while True:
@@ -54,7 +57,11 @@ class Subscriber:
                     segment = segments.__next__()
                 identifier = find_identifier(segment)
 
-                if identifier == ClaimLoop.initiating_identifier:
+                if identifier == SubscriberSegment.identification:
+                    subscriber.subscriber = SubscriberSegment(segment)
+                    segment = None
+
+                elif identifier == ClaimLoop.initiating_identifier:
                     claim, segments, segment = ClaimLoop.build(segment, segments)
                     subscriber.claims.append(claim)
 
