@@ -53,7 +53,10 @@ class Provider:
         while True:
             try:
                 if segment is None:
-                    segment = segments.__next__()
+                    try:
+                        segment = segments.__next__()
+                    except:
+                        import pdb; pdb.set_trace()
                 identifier = find_identifier(segment)
 
                 if identifier == SubscriberLoop.initiating_identifier:

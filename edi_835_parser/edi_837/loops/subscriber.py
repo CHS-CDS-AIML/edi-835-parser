@@ -4,6 +4,7 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
+from edi_835_parser.edi_837.segments.demographic import Demographic as DemographicSegment
 from edi_835_parser.edi_837.loops.claim import Claim as ClaimLoop
 
 from edi_835_parser.segments.address import Address as AddressSegment
@@ -26,12 +27,14 @@ class Subscriber:
             subscriber: SubscriberSegment = None, # SBR
             address: AddressSegment = None, #N3 
             location: LocationSegment = None,
+            demographic: DemographicSegment = None,
             claims: List[ClaimSegment] = None, #CLM
             entities: List[EntitySegment] = None,
             ):
         self.subscriber = subscriber
         self.address = address
         self.location = location
+        self.demographic = demographic
         self.entities = entities if entities else []
         self.claims = claims if claims else []
 
@@ -53,7 +56,7 @@ class Subscriber:
 
                 if identifier == ClaimLoop.initiating_identifier:
                     claim, segments, segment = ClaimLoop.build(segment, segments)
-                    subscriber.subscribers.append(claim)
+                    subscriber.claims.append(claim)
 
                 elif identifier == AddressSegment.identification:
                     subscriber.address = AddressSegment(segment)
@@ -61,6 +64,10 @@ class Subscriber:
 
                 elif identifier == LocationSegment.identification:
                     subscriber.location = LocationSegment(segment)
+                    segment = None
+
+                elif identifier == DemographicSegment.identification:
+                    subscriber.demographic = DemographicSegment(segment)
                     segment = None
                
                 elif identifier in cls.terminating_identifiers:
@@ -72,7 +79,7 @@ class Subscriber:
                     warn(message)
 
             except StopIteration:
-                return organization, None, None
+                return subscriber, None, None
 
 
 if __name__ == "__main__":

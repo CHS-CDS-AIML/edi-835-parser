@@ -124,7 +124,7 @@ class Claim:
                     segment = None
 
                 elif identifier == DiagnosisCodesSegment.identification:
-                    diagnosis_codes = DiagnosisCodes(segment)
+                    diagnosis_codes = DiagnosisCodesSegment(segment)
                     claim.diagnosis_codes = diagnosis_codes
                     segment = None
 
