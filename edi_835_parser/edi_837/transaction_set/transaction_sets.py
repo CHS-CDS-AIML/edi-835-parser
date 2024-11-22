@@ -2,7 +2,7 @@ from typing import List, Iterable
 
 import pandas as pd
 
-from edi_835_parser.transaction_set.transaction_set import TransactionSet
+from edi_835_parser.edi_837.transaction_set.transaction_set import TransactionSet
 
 
 class TransactionSets:

@@ -1,6 +1,5 @@
 from edi_835_parser.elements.identifier import Identifier
-from edi_835_parser.elements.entity_code import EntityCode
-from edi_835_parser.edi_837.bill_provider import BillProvider
+from edi_835_parser.edi_837.elements.entity_code import EntityCode
 from edi_835_parser.elements.entity_type import EntityType
 from edi_835_parser.elements.identification_code_qualifier import (
     IdentificationCodeQualifier,
@@ -24,15 +23,14 @@ class Entity:
             self.identifier = segment[0]
         except IndexError:
             self.identifier = None
-
         try:
-            self.bill_provider = segment[1]
-        except IndexError:
-            self.bill_provider = None
-        try:
-            self.entity = segment[2]
+            self.entity = segment[1]
         except IndexError:
             self.entity = None
+        try:
+            self.type = segment[2]
+        except IndexError:
+            self.type = None
         try:
             self.last_name = segment[3]
         except IndexError:

@@ -3,7 +3,7 @@ from typing import List
 from warnings import warn
 
 from edi_835_parser.edi_837.transaction_set.transaction_set import TransactionSet
-from edi_835_parser.transaction_set.transaction_sets import TransactionSets
+from edi_835_parser.edi_837.transaction_set.transaction_sets import TransactionSets
 
 
 def parse(path: str, debug: bool = False) -> TransactionSets:

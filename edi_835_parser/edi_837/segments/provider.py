@@ -16,11 +16,7 @@ class Provider:
         self.identifier = segment[0]
         self.type = segment[1]
         try:
-            self.id_type = segment[3]
-        except:
-            self.id_type = None
-        try:
-            self.identification_code = int(segment[4]) if len(segment) >= 5 else None
+            self.identification_code = segment[3]
         except:
             self.identification_code = None
 

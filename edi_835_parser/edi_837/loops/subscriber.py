@@ -11,7 +11,7 @@ from edi_835_parser.edi_837.segments.hierarchy import Hierarchy as HierarchySegm
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
-from edi_835_parser.segments.entity import Entity as EntitySegment
+from edi_835_parser.edi_837.segments.entity import Entity as EntitySegment
 
 #name: NameSegment = None # NM1kj
 class Subscriber:
@@ -45,6 +45,18 @@ class Subscriber:
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
+
+    @property
+    def patient(self) -> Optional[EntitySegment]:
+        name = [
+            e for e in self.entities if e.entity == "patient"
+        ]
+        print(name)
+        assert len(name) <= 1
+
+        if len(name) == 1:
+            return name[0]
+
     @classmethod
     def build(
         cls, current_segment: str, segments: Iterator[str]
@@ -55,14 +67,16 @@ class Subscriber:
         segment = segments.__next__()
         while True:
             try:
-                try:
-                    segment = segments.__next__()
-                except:
-                    import pdb; pdb.set_trace()
+                segment = segments.__next__()
                 identifier = find_identifier(segment)
 
                 if identifier == SubscriberSegment.identification:
                     subscriber.subscriber = SubscriberSegment(segment)
+                    segment = None
+
+                elif identifier == EntitySegment.identification:
+                    entity = EntitySegment(segment)
+                    subscriber.entities.append(entity)
                     segment = None
 
                 elif identifier == ClaimLoop.initiating_identifier:

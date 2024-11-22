@@ -44,11 +44,11 @@ class TransactionSet:
     def to_dataframe(self) -> pd.DataFrame:
         """flatten the remittance advice by service to a pandas DataFrame"""
         data = []
-        import pdb; pdb.set_trace()
         for provider in self.providers:
-            for subscriber in self.subscribers:
-                for claim in org.claims:
+            for subscriber in provider.subscribers:
+                for claim in subscriber.claims:
                     for service in claim.services:
+                        import pdb; pdb.set_trace()
                         datum = TransactionSet.serialize_service(
                             self.financial_information, provider, subscriber, claim, service
                         )
@@ -102,32 +102,11 @@ class TransactionSet:
             facility_npi = None
 
         datum = {
-            "marker": claim.claim.marker,
-            "patient_identifier": ea_code,
-            "patient": claim.patient.name,
-            "id_code_qualifier": claim.patient.identification_code_qualifier,
-            "id_code": claim.patient.identification_code,
-            "code": service.service.code,
-            "modifier": service.service.modifier,
-            "qualifier": service.service.qualifier,
-            "allowed_units": service.service.allowed_units,
-            "billed_units": service.service.billed_units,
-            "transaction_date": financial_information.transaction_date,
-            "icn": claim.claim.icn,
-            "charge_amount": service.service.charge_amount,
-            "allowed_amount": service.allowed_amount,
-            "paid_amount": service.service.paid_amount,
-            "payer": organization.payer.name,
-            "start_date": start_date,
-            "end_date": end_date,
-            "start_date_type": start_date_type,
-            "end_date_type": end_date_type,
-            "rendering_provider": (
-                claim.rendering_provider.name if claim.rendering_provider else None
-            ),
-            "payer_classification": str(claim.claim.status.payer_classification),
-            "was_forwarded": claim.claim.status.was_forwarded,
-            "facility_npi": facility_npi,
+            "billing_id_code": provider.provider.identification_code,
+            # Get provider name
+            "subscriber_responsibility": subscriber.subscriber.responsibility,
+            "subscriber_group_number": subscriber.subscriber.group_number,
+            "subscriber_plan": subscriber.subscriber.plan,
         }
 
         return datum
@@ -136,8 +115,10 @@ class TransactionSet:
     def build(cls, file_path: str) -> "TransactionSet":
         interchange = None
         financial_information = None
+        providers = []
+        subscribers = []
         claims = []
-        organizations = []
+        service_lines = []
 
         try:
             with open(file_path) as f:
