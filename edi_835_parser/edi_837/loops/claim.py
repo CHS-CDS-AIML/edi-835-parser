@@ -3,9 +3,8 @@ from warnings import warn
 
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
-from edi_835_parser.edi_837.segments.claim import Subscriber as ClaimSegment
-from edi_835_parser.edi_837.loops.subscriber import Subscriber as SubscriberLoop
-from edi_835_parser.edi_837.loops.subscriber import Claim as ClaimLoop
+from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
+from edi_835_parser.edi_837.loops.service import Service as ServiceLoop
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
@@ -29,7 +28,7 @@ class Claim:
         references: List[ReferenceSegment] = None,
         dates: List[DateSegment] = None,
         amount: AmountSegment = None,
-        self.diagnosis_codes = List[DiagnosisCode] = None,
+        diagnosis_codes: List[DiagnosisCode] = None,
     ):
         self.claim = claim
         self.entities = entities if entities else []

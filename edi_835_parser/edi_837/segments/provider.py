@@ -1,5 +1,5 @@
 from edi_835_parser.elements.identifier import Identifier
-from edi_835_parser.elements.provider_type import ProviderType
+from edi_835_parser.edi_837.elements.provider_type import ProviderType
 from edi_835_parser.segments.utilities import split_segment
 
 

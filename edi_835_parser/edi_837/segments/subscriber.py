@@ -18,7 +18,7 @@ class Subscriber:
 
         self.identifier = segment[0]
         self.responsibility = segment[1]# P = Primary, S = SEcondary, T = Tertiary
-        self.relationship = segment[2 # Client relationship to insured, 01 = Spouse, 18 = self, 19 = child, G8 = other
+        self.relationship = segment[2] # Client relationship to insured, 01 = Spouse, 18 = self, 19 = child, G8 = other
         self.group_number = segment[3] # Policy/group number
         self.plan = segment[4] # Plan/Program
         self.msp = segment[5] # medicary secondary payer (msp) code

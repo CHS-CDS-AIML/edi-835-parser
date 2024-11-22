@@ -3,9 +3,8 @@ from warnings import warn
 
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
-from edi_835_parser.edi_837.segments.claim import Subscriber as ClaimSegment
-from edi_835_parser.edi_837.loops.subscriber import Subscriber as SubscriberLoop
-from edi_835_parser.edi_837.loops.subscriber import Claim as ClaimLoop
+from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
+from edi_835_parser.edi_837.loops.claim import Claim as ClaimLoop
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
@@ -24,10 +23,10 @@ class Subscriber:
     ]
     def __init__(
             self,
-            subscriber: SubscriberSegment = None # SBR
-            address: AddressSegment = None #N3
-            location: LocationSegment
-            claims: List[ClaimSegment] = None CLM
+            subscriber: SubscriberSegment = None, # SBR
+            address: AddressSegment = None, #N3 
+            location: LocationSegment = None,
+            claims: List[ClaimSegment] = None, #CLM
             entities: List[EntitySegment] = None,
             ):
         self.subscriber = subscriber
