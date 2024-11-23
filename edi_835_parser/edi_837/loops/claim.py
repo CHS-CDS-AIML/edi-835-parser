@@ -12,7 +12,7 @@ from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
 from edi_835_parser.segments.entity import Entity as EntitySegment
-from edi_835_parser.segments.reference import Reference as ReferenceSegment
+from edi_835_parser.edi_837.segments.reference import Reference as ReferenceSegment
 from edi_835_parser.segments.date import Date as DateSegment
 from edi_835_parser.segments.amount import Amount as AmountSegment
 
@@ -51,12 +51,33 @@ class Claim:
     @property
     def rendering_provider(self) -> Optional[EntitySegment]:
         rendering_provider = [
-            e for e in self.entities if e.entity == "rendering provider"
+            e for e in self.entities if e.entity == "rendering_provider"
         ]
         assert len(rendering_provider) <= 1
 
         if len(rendering_provider) == 1:
             return rendering_provider[0]
+
+    @property
+    def facility(self) -> Optional[EntitySegment]:
+        facility = [
+            e for e in self.entities if e.entity == "facility"
+        ]
+        assert len(facility) <= 1
+
+        if len(facility) == 1:
+            return facility[0]
+
+    @property
+    def authorization_number(self) -> Optional[ReferenceSegment]:
+        auth_number = [
+            r for r in self.references if r.qualifier == "authorization_number"
+        ]
+
+        assert len(auth_number) <= 1
+
+        if len(auth_number) == 1:
+            return auth_number[0]
 
     @property
     def provider(self) -> Optional[EntitySegment]:

@@ -5,10 +5,11 @@ from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.loops.subscriber import Subscriber as SubscriberLoop
 from edi_835_parser.edi_837.segments.hierarchy import Hierarchy as HierarchySegment
+from edi_835_parser.edi_837.segments.entity import Entity as EntitySegment
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
-from edi_835_parser.segments.reference import Reference as ReferenceSegment
+from edi_835_parser.edi_837.segments.reference import Reference as ReferenceSegment
 from edi_835_parser.segments.utilities import find_identifier
 
 
@@ -37,6 +38,7 @@ class Provider:
             subscribers: SubscriberSegment = None, #HL
             location: LocationSegment = None,
             reference: ReferenceSegment = None,
+            entities: List[EntitySegment] = None,
             ):
         self.provider = provider
         self.hierarchy = hierarchy
@@ -44,9 +46,33 @@ class Provider:
         self.subscribers = subscribers if subscribers else []
         self.location = location
         self.reference = reference
+        self.entities = entities if entities else []
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
+
+    @property
+    def name(self) -> Optional[EntitySegment]:
+        name = [
+                e for e in self.entities if e.entity == "billing_provider"# TODO: Get entity name
+        ]
+        print(name)
+        assert len(name) <= 1
+
+        if len(name) == 1:
+            return name[0]
+
+    @property
+    def pay_to_provider(self) -> Optional[EntitySegment]:
+        name = [
+                e for e in self.entities if e.entity == "pay_to_provider"# TODO: Get entity name
+        ]
+        print(name)
+        assert len(name) <= 1
+
+        if len(name) == 1:
+            return name[0]
+
     @classmethod
     def build(
         cls, current_segment: str, segments: Iterator[str]
@@ -77,6 +103,11 @@ class Provider:
 
                 elif identifier == LocationSegment.identification:
                     provider.location = LocationSegment(segment)
+                    segment = None
+
+                elif identifier == EntitySegment.identification:
+                    entity = EntitySegment(segment)
+                    provider.entities.append(entity)
                     segment = None
 
                 elif identifier == ReferenceSegment.identification:

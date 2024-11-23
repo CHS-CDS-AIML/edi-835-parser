@@ -12,7 +12,7 @@ from edi_835_parser.segments.amount import Amount as AmountSegment
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
-from edi_835_parser.segments.reference import Reference as ReferenceSegment
+from edi_835_parser.edi_837.segments.reference import Reference as ReferenceSegment
 from edi_835_parser.elements.dollars import Dollars
 
 class Service:

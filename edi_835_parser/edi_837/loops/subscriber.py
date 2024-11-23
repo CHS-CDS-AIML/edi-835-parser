@@ -58,6 +58,17 @@ class Subscriber:
         if len(name) == 1:
             return name[0]
 
+    @property
+    def payer(self) -> Optional[EntitySegment]:
+        name = [
+            e for e in self.entities if e.entity == "payer"
+        ]
+        print(name)
+        assert len(name) <= 1
+
+        if len(name) == 1:
+            return name[0]
+
     @classmethod
     def build(
         cls, current_segment: str, segments: Iterator[str]
