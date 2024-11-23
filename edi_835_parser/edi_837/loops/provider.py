@@ -56,7 +56,6 @@ class Provider:
         name = [
                 e for e in self.entities if e.entity == "billing_provider"# TODO: Get entity name
         ]
-        print(name)
         assert len(name) <= 1
 
         if len(name) == 1:
@@ -67,7 +66,6 @@ class Provider:
         name = [
                 e for e in self.entities if e.entity == "pay_to_provider"# TODO: Get entity name
         ]
-        print(name)
         assert len(name) <= 1
 
         if len(name) == 1:

@@ -52,7 +52,6 @@ class Subscriber:
         name = [
             e for e in self.entities if e.entity == "patient"
         ]
-        print(name)
         assert len(name) <= 1
 
         if len(name) == 1:
@@ -63,7 +62,6 @@ class Subscriber:
         name = [
             e for e in self.entities if e.entity == "payer"
         ]
-        print(name)
         assert len(name) <= 1
 
         if len(name) == 1:
