@@ -87,12 +87,14 @@ class Provider:
                     if segment.split("*")[1] == "AT":
                         message = f"Identifier: {identifier} not handled in provider loop."
                         warn(message)
+                        segment = None
                     elif identifier == "HL":
-                        if provider.hierarchy.hierarchy_type == "20":
+                        if segment.split("*")[2] == cls.terminating_parent:
                             return provider, segments, segment
                         else:
-                            message = f"Identifier: {identifier} not handled in provider loop."
+                            message = f"identifier: {identifier} not handled in provider loop."
                             warn(message)
+                            segment = None
                     else:
                         return provider, segments, segment
 

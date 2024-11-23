@@ -188,6 +188,7 @@ class TransactionSet:
 
         if identifier == ProviderLoop.initiating_identifier and segment.split("*")[2] == "":
             provider, segments, segment = ProviderLoop.build(segment, segments)
+            import pdb; pdb.set_trace()
             return BuildAttributeResponse(
                 "provider", provider, segment, segments
             )
