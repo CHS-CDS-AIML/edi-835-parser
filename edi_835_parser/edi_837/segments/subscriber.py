@@ -16,8 +16,8 @@ class Subscriber:
         self.segment = segment
         segment = split_segment(segment)
 
-        if "PAT" in segment:
-            import pdb; pdb.set_trace()
+        # TODO: Build patient class
+        #if "PAT" in segment:
         self.identifier = segment[0]
         try:
             self.responsibility = segment[1]# P = Primary, S = SEcondary, T = Tertiary

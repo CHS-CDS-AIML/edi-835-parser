@@ -186,7 +186,7 @@ class TransactionSet:
                 "financial information", financial_information, None, segments
             )
 
-        if identifier == ProviderLoop.initiating_identifier:
+        if identifier == ProviderLoop.initiating_identifier and segment.split("*")[2] == "":
             provider, segments, segment = ProviderLoop.build(segment, segments)
             return BuildAttributeResponse(
                 "provider", provider, segment, segments

@@ -20,14 +20,15 @@ class Provider:
     address - ok
     location (n4) - ok
     ref (ref) - ok
-    contact (PER) - not completed but don't think we need
     """
     initiating_identifier = HierarchySegment.identification
+    initiating_parent = ""
     terminating_identifiers = [
         HierarchySegment.identification,
         "SE",
         "IEA",
     ]
+    terminating_parent = ""
     def __init__(
             self,
             provider: ProviderSegment = None, # PRV
@@ -52,22 +53,18 @@ class Provider:
     ) -> Tuple["ProviderSegment", Optional[Iterator[str]], Optional[str]]:
         provider = Provider()
         provider.hierarchy = HierarchySegment(current_segment)
-
         segment = segments.__next__()
+        identifier = find_identifier(segment)
+        provider.provider = ProviderSegment(segment)
+        segment = segments.__next__()
+
         while True:
             try:
                 if segment is None:
-                    try:
-                        segment = segments.__next__()
-                    except:
-                        import pdb; pdb.set_trace()
+                    segment = segments.__next__()
                 identifier = find_identifier(segment)
-          
-                if identifier == ProviderSegment.identification:
-                    provider.provider = ProviderSegment(segment)
-                    segment = None
 
-                elif identifier == SubscriberLoop.initiating_identifier:
+                if identifier in SubscriberLoop.initiating_identifier and segment.split("*")[1] == SubscriberLoop.initiating_type:
                     subscriber, segments, segment = SubscriberLoop.build(segment, segments)
                     provider.subscribers.append(subscriber)
                     # check if claims has hit end
@@ -87,10 +84,15 @@ class Provider:
                     segment = None
                
                 elif identifier in cls.terminating_identifiers:
-                    # TODO: Need to handle PRV segment in Claim (PRV*PE)
                     if segment.split("*")[1] == "AT":
                         message = f"Identifier: {identifier} not handled in provider loop."
                         warn(message)
+                    elif identifier == "HL":
+                        if provider.hierarchy.hierarchy_type == "20":
+                            return provider, segments, segment
+                        else:
+                            message = f"Identifier: {identifier} not handled in provider loop."
+                            warn(message)
                     else:
                         return provider, segments, segment
 

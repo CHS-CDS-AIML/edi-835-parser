@@ -18,7 +18,8 @@ class Subscriber:
     """Class representing 2000A loop of 837
     name (NM1) - okay
     """
-    initiating_identifier = HierarchySegment.identification
+    initiating_identifier = [HierarchySegment.identification, SubscriberSegment.identification]
+    initiating_type = "22"
     terminating_identifiers = [
         ClaimSegment.identification, # CLM
         HierarchySegment.identification,
@@ -62,12 +63,18 @@ class Subscriber:
         cls, current_segment: str, segments: Iterator[str]
     ) -> Tuple["SubscriberSegment", Optional[Iterator[str]], Optional[str]]:
         subscriber = Subscriber()
-        subscriber.hierarchy = HierarchySegment(current_segment)
-
+        identifier = find_identifier(current_segment)
+        if identifier == "HL":
+            subscriber.hierarchy = HierarchySegment(current_segment)
+            segment = segments.__next__()
+        subscriber.subscriber = SubscriberSegment(segment)
         segment = segments.__next__()
+
         while True:
             try:
-                segment = segments.__next__()
+                if segment is None:
+                    segment = segments.__next__()
+
                 identifier = find_identifier(segment)
 
                 if identifier == SubscriberSegment.identification:
