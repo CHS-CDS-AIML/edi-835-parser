@@ -7,13 +7,13 @@ from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
 from edi_835_parser.edi_837.segments.service import Service as ServiceSegment
 from edi_835_parser.edi_837.segments.diagnosis_codes import DiagnosisCodes as DiagnosisCodesSegment
 from edi_835_parser.edi_837.loops.service import Service as ServiceLoop
+from edi_835_parser.edi_837.segments.date import Date as DateSegment
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
 from edi_835_parser.segments.entity import Entity as EntitySegment
 from edi_835_parser.edi_837.segments.reference import Reference as ReferenceSegment
-from edi_835_parser.segments.date import Date as DateSegment
 from edi_835_parser.segments.amount import Amount as AmountSegment
 
 class Claim:
@@ -91,23 +91,18 @@ class Claim:
 
     @property
     def claim_statement_period_start(self) -> Optional[DateSegment]:
-        statement_period_start = [
-            d for d in self.dates if d.qualifier == "claim statement period start"
-        ]
-        assert len(statement_period_start) <= 1
+        #statement_period_start = [
+        #    d for d in self.dates #if d.qualifier == "claim statement period start"
+        #]
+        #assert len(statement_period_start) <= 1
 
-        if len(statement_period_start) == 1:
-            return statement_period_start[0]
+        #if len(statement_period_start) == 1:
+        #    return statement_period_start[0]
+        return None
 
     @property
     def claim_statement_period_end(self) -> Optional[DateSegment]:
-        statement_period_end = [
-            d for d in self.dates if d.qualifier == "claim statement period end"
-        ]
-        assert len(statement_period_end) <= 1
-
-        if len(statement_period_end) == 1:
-            return statement_period_end[0]
+        return None
 
     #@property
     #def patient(self) -> EntitySegment:

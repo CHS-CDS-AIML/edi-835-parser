@@ -6,8 +6,8 @@ from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberS
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
 from edi_835_parser.edi_837.segments.service_line import ServiceLine as ServiceLineSegment
 from edi_835_parser.edi_837.segments.service import Service as ServiceSegment
+from edi_835_parser.edi_837.segments.date import Date as DateSegment
 
-from edi_835_parser.segments.date import Date as DateSegment
 from edi_835_parser.segments.amount import Amount as AmountSegment
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
@@ -61,7 +61,7 @@ class Service:
     @property
     def service_period_start(self) -> Optional[DateSegment]:
         service_period_start = [
-            d for d in self.dates if d.qualifier == "service period start"
+            d for d in self.dates #if d.qualifier == "service period start"
         ]
         assert len(service_period_start) <= 1, f"{self.dates}"
 
@@ -73,7 +73,7 @@ class Service:
     @property
     def service_period_end(self) -> Optional[DateSegment]:
         service_period_end = [
-            d for d in self.dates if d.qualifier == "service period end"
+            d for d in self.dates #if d.qualifier == "service period end"
         ]
         assert len(service_period_end) <= 1
 
@@ -100,6 +100,7 @@ class Service:
 
                 elif identifier == DateSegment.identification:
                     date = DateSegment(segment)
+                    import pdb; pdb.set_trace()
                     service.dates.append(date)
 
                 elif identifier == AmountSegment.identification:
