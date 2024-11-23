@@ -55,7 +55,6 @@ class TransactionSet:
                         )
 
                         data.append(datum)
-
         df = pd.DataFrame(data)
         import pdb; pdb.set_trace()
 
@@ -96,13 +95,23 @@ class TransactionSet:
 
         datum = {
             "billing_id_code": provider.provider.identification_code,
-            # Get provider name
+            "billing_provider": provider.name.last_name,
+            "pay_to_provider": provider.pay_to_provider.last_name,
             "subscriber_responsibility": subscriber.subscriber.responsibility,
+            "subscriber_relationship": subscriber.subscriber.relationship,
             "subscriber_group_number": subscriber.subscriber.group_number,
             "subscriber_plan": subscriber.subscriber.plan,
-            #subscriber_name": subscriber.patient.name,
+            "subscriber_name": subscriber.patient.first_name + " " + subscriber.patient.last_name,
+            "subscriber_code_qualifer": subscriber.patient.identification_code_qualifier,
+            "subscriber_code": subscriber.patient.identification_code,
+            # TODO: Get demographic
+            "subscriber_payer": subscriber.payer.last_name,
+            "claim_rendering_provider": claim.rendering_provider,
+            "facility": claim.facility.last_name if claim.facility else None,
+            "facility_npi": claim.facility.identification_code if claim.facility else None,
             "claim_identifier": claim.claim.claim_identifier,
             "claim_amount": claim.claim.claim_amount,
+            "authorization_number": claim.authorization_number,
             "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
             "charge_amount": service.service.charge_amount,
         }
@@ -188,16 +197,18 @@ class TransactionSet:
 
         if identifier == ProviderLoop.initiating_identifier and segment.split("*")[2] == "":
             provider, segments, segment = ProviderLoop.build(segment, segments)
-            import pdb; pdb.set_trace()
             return BuildAttributeResponse(
                 "provider", provider, segment, segments
             )
 
-        elif identifier == SubscriberLoop.initiating_identifier:
-            subscriber, segments, segment = SubscriberLoop.build(segment, segments)
-            return BuildAttributeResponse(
-                "subscriber", subscriber, segment, segments
-            )
+        elif identifier in SubscriberLoop.initiating_identifier:
+            if identifier == "HL" and segment.split("*")[3] != "22":
+                pass
+            else:
+               subscriber, segments, segment = SubscriberLoop.build(segment, segments)
+               return BuildAttributeResponse(
+                   "subscriber", subscriber, segment, segments
+               )
 
         elif identifier == ClaimLoop.initiating_identifier:
             claim, segments, segment = ClaimLoop.build(segment, segments)

@@ -88,7 +88,7 @@ class Provider:
                     segment = segments.__next__()
                 identifier = find_identifier(segment)
 
-                if identifier in SubscriberLoop.initiating_identifier and segment.split("*")[1] == SubscriberLoop.initiating_type:
+                if identifier in SubscriberLoop.initiating_identifier and segment.split("*")[3] == SubscriberLoop.initiating_type:
                     subscriber, segments, segment = SubscriberLoop.build(segment, segments)
                     provider.subscribers.append(subscriber)
                     # check if claims has hit end
