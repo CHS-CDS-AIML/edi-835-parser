@@ -4,9 +4,9 @@ from warnings import warn
 from edi_835_parser.edi_837.segments.provider import Provider as ProviderSegment
 from edi_835_parser.edi_837.segments.subscriber import Subscriber as SubscriberSegment
 from edi_835_parser.edi_837.segments.claim import Claim as ClaimSegment
-from edi_835_parser.edi_837.segments.demographic import Demographic as DemographicSegment
 from edi_835_parser.edi_837.loops.claim import Claim as ClaimLoop
 from edi_835_parser.edi_837.segments.hierarchy import Hierarchy as HierarchySegment
+from edi_835_parser.edi_837.segments.demographic import Demographic as DemographicSegment
 
 from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment

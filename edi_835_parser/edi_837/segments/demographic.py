@@ -13,6 +13,7 @@ class Demographic:
         self.segment = segment
         segment = split_segment(segment)
         self.identifier = segment[0]
+        self.id = segment[1]
         self.dob = segment[2]
 
     def __repr__(self):
