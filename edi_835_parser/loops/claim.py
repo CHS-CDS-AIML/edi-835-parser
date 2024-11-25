@@ -3,7 +3,7 @@ from warnings import warn
 
 from edi_835_parser.segments.claim import Claim as ClaimSegment
 from edi_835_parser.segments.organization import Organization as OrganizationSegment
-from edi_835_parser.edi_837.segments.entity import Entity as EntitySegment
+from edi_835_parser.segments.entity import Entity as EntitySegment
 from edi_835_parser.segments.provider_summary import ProviderSummary as ProviderSummarySegment
 from edi_835_parser.segments.reference import Reference as ReferenceSegment
 from edi_835_parser.segments.date import Date as DateSegment
