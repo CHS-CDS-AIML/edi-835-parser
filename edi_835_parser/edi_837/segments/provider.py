@@ -13,7 +13,10 @@ class Provider:
         self.segment = segment
         segment = split_segment(segment)
 
+        #try:
         self.identifier = segment[0]
+        #except:
+        #    import pdb; pdb.set_trace()
         self.type = segment[1]
         try:
             self.identification_code = segment[3]

@@ -79,6 +79,8 @@ class Provider:
         provider.hierarchy = HierarchySegment(current_segment)
         segment = segments.__next__()
         identifier = find_identifier(segment)
+        if identifier != "PRV":
+            return provider, None, None
         provider.provider = ProviderSegment(segment)
         segment = segments.__next__()
 
