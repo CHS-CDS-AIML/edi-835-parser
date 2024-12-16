@@ -127,14 +127,12 @@ class TransactionSet:
         start_date_type = None
         if claim.claim_statement_period_start:
             start_date = claim.claim_statement_period_start.date
-            start_date_type = "claim_statement"
 
         # if the service doesn't have an end date assume the service and claim dates match
         end_date = None
         end_date_type = None
         if claim.claim_statement_period_end:
             end_date = claim.claim_statement_period_end.date
-            end_date_type = "claim_statement"
 
         ea_code = None
         for reference in claim.references:
@@ -166,10 +164,10 @@ class TransactionSet:
             "allowed_amount": None,
             "paid_amount": claim.claim.paid_amount,
             "payer": organization.payer.name,
-            "start_date": start_date,
-            "end_date": end_date,
-            "start_date_type": start_date_type,
-            "end_date_type": end_date_type,
+            "start_date": None,
+            "end_date": None,
+            "claim_start_date": start_date,
+            "claim_end_date": end_date,
             "rendering_provider": (
                 claim.rendering_provider.name if claim.rendering_provider else None
             ),
@@ -190,23 +188,19 @@ class TransactionSet:
     ) -> dict:
         # if the service doesn't have a start date assume the service and claim dates match
         start_date = None
-        start_date_type = None
+        claim_start_date = None
         if service.service_period_start:
             start_date = service.service_period_start.date
-            start_date_type = "service_period"
-        elif claim.claim_statement_period_start:
-            start_date = claim.claim_statement_period_start.date
-            start_date_type = "claim_statement"
+        if claim.claim_statement_period_start:
+            claim_start_date = claim.claim_statement_period_start.date
 
         # if the service doesn't have an end date assume the service and claim dates match
         end_date = None
-        end_date_type = None
+        claim_end_date = None
         if service.service_period_end:
             end_date = service.service_period_end.date
-            end_date_type = "service_period"
         elif claim.claim_statement_period_end:
-            end_date = claim.claim_statement_period_end.date
-            end_date_type = "claim_statement"
+            claim_end_date = claim.claim_statement_period_end.date
 
         ea_code = None
         for reference in claim.references:
@@ -238,10 +232,10 @@ class TransactionSet:
             "allowed_amount": service.allowed_amount,
             "paid_amount": service.service.paid_amount,
             "payer": organization.payer.name,
-            "start_date": start_date,
-            "end_date": end_date,
-            "start_date_type": start_date_type,
-            "end_date_type": end_date_type,
+            "service_start_date": start_date,
+            "service_end_date": end_date,
+            "claim_start_date": claim_start_date,
+            "claim_end_date": claim_end_date,
             "rendering_provider": (
                 claim.rendering_provider.name if claim.rendering_provider else None
             ),
