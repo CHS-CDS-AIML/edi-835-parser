@@ -199,7 +199,7 @@ class TransactionSet:
         claim_end_date = None
         if service.service_period_end:
             end_date = service.service_period_end.date
-        elif claim.claim_statement_period_end:
+        if claim.claim_statement_period_end:
             claim_end_date = claim.claim_statement_period_end.date
 
         ea_code = None
