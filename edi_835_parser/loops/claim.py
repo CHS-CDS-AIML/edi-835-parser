@@ -76,6 +76,16 @@ class Claim:
             return statement_period_end[0]
 
     @property
+    def claim_received_date(self) -> Optional[DateSegment]:
+        received = [
+            d for d in self.dates if d.qualifier == "received"
+        ]
+        assert len(received) <= 1
+
+        if len(received) == 1:
+            return received[0]
+
+    @property
     def patient(self) -> EntitySegment:
         patient = [e for e in self.entities if e.entity == "patient"]
         assert len(patient) == 1

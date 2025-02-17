@@ -8,6 +8,7 @@ from edi_835_parser.loops.service import Service as ServiceLoop
 from edi_835_parser.loops.organization import Organization as OrganizationLoop
 from edi_835_parser.segments.utilities import find_identifier
 from edi_835_parser.segments.interchange import Interchange as InterchangeSegment
+from edi_835_parser.segments.date import Date as DateSegment
 from edi_835_parser.segments.financial_information import (
     FinancialInformation as FinancialInformationSegment,
 )
@@ -23,12 +24,14 @@ class TransactionSet:
         self,
         interchange: InterchangeSegment,
         financial_information: FinancialInformationSegment,
+        processed_date: DateSegment,
         claims: List[ClaimLoop],
         organizations: List[OrganizationLoop],
         file_path: str,
     ):
         self.interchange = interchange
         self.financial_information = financial_information
+        self.processed_date = processed_date
         self.claims = claims
         self.organizations = organizations
         self.file_path = file_path
@@ -63,7 +66,7 @@ class TransactionSet:
             for claim in org.claims:
                 for service in claim.services:
                     datum = TransactionSet.serialize_service(
-                        self.financial_information, org, claim, service
+                        self.financial_information, self.processed_date, org, claim, service
                     )
                     datum["loop"] = "service"
 
@@ -84,7 +87,7 @@ class TransactionSet:
 
                 if len(claim.services) == 0:
                     datum = TransactionSet.serialize_claim(
-                        self.financial_information, org, claim
+                        self.financial_information, self.processed_date, org, claim
                     )
                     datum["loop"] = "claim"
 
@@ -118,6 +121,7 @@ class TransactionSet:
     @staticmethod
     def serialize_claim(
         financial_information: FinancialInformationSegment,
+        processed_date: DateSegment,
         organization: OrganizationLoop,
         #payee: OrganizationLoop,
         claim: ClaimLoop,
@@ -133,6 +137,12 @@ class TransactionSet:
         end_date_type = None
         if claim.claim_statement_period_end:
             end_date = claim.claim_statement_period_end.date
+
+        # get received and processed date if available
+        if claim.claim_received_date:
+            claim_received_date = claim.claim_received_date.date
+        else:
+            claim_received_date = None
 
         ea_code = None
         for reference in claim.references:
@@ -168,6 +178,8 @@ class TransactionSet:
             "end_date": None,
             "claim_start_date": start_date,
             "claim_end_date": end_date,
+            "claim_received_date": claim_received_date,
+            "claim_processed_date": processed_date.date,
             "rendering_provider": (
                 claim.rendering_provider.name if claim.rendering_provider else None
             ),
@@ -181,6 +193,7 @@ class TransactionSet:
     @staticmethod
     def serialize_service(
         financial_information: FinancialInformationSegment,
+        processed_date: DateSegment,
         #payer: OrganizationLoop,
         organization: OrganizationLoop,
         claim: ClaimLoop,
@@ -201,6 +214,12 @@ class TransactionSet:
             end_date = service.service_period_end.date
         if claim.claim_statement_period_end:
             claim_end_date = claim.claim_statement_period_end.date
+
+        # get received and processed date if available
+        if claim.claim_received_date:
+            claim_received_date = claim.claim_received_date.date
+        else:
+            claim_received_date = None
 
         ea_code = None
         for reference in claim.references:
@@ -236,6 +255,8 @@ class TransactionSet:
             "service_end_date": end_date,
             "claim_start_date": claim_start_date,
             "claim_end_date": claim_end_date,
+            "claim_received_date": claim_received_date,
+            "claim_processed_date": processed_date.date,
             "rendering_provider": (
                 claim.rendering_provider.name if claim.rendering_provider else None
             ),
@@ -266,6 +287,7 @@ class TransactionSet:
 
         segments = iter(segments)
         segment = None
+        processed_date = None
 
         while True:
             response = cls.build_attribute(segment, segments)
@@ -282,6 +304,9 @@ class TransactionSet:
             if response.key == "financial information":
                 financial_information = response.value
 
+            if response.key == "processed date":
+                processed_date = response.value
+
             if response.key == "organization":
                 organizations.append(response.value)
 
@@ -289,7 +314,7 @@ class TransactionSet:
                 claims.append(response.value)
 
         return TransactionSet(
-            interchange, financial_information, claims, organizations, file_path
+            interchange, financial_information, processed_date, claims, organizations, file_path
         )
 
     @classmethod
@@ -314,6 +339,13 @@ class TransactionSet:
             return BuildAttributeResponse(
                 "financial information", financial_information, None, segments
             )
+
+        if identifier == DateSegment.identification:
+            processed_date = DateSegment(segment)
+            if processed_date.qualifier == "processed":
+                return BuildAttributeResponse(
+                    "processed date", processed_date, None, segments
+                )
 
         if identifier == OrganizationLoop.initiating_identifier:
             organization, segments, segment = OrganizationLoop.build(segment, segments)

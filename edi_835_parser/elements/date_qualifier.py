@@ -5,9 +5,11 @@ date_qualifiers = {
 	'050': 'received',
 	'150': 'service period start',
 	'151': 'service period end',
+    '405': 'processed',
 	'472': 'service',
 	'232': 'claim statement period start',
 	'233': 'claim statement period end',
+    '573': 'claim denial date',
 }
 
 
