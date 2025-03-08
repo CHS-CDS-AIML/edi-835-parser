@@ -8,7 +8,6 @@ from edi_835_parser.segments.address import Address as AddressSegment
 from edi_835_parser.segments.location import Location as LocationSegment
 from edi_835_parser.segments.utilities import find_identifier
 
-
 class Organization:
     # TODO: Put claim loop in here to get correct hierarchy
     initiating_identifier = OrganizationSegment.identification
