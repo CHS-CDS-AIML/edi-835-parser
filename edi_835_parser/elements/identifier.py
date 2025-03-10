@@ -7,7 +7,6 @@ class Identifier(Element):
 
     def __set__(self, obj, value):
         if obj.identification != value:
-            import pdb; pdb.set_trace()
             raise ValueError("class identifier does not match segment identifier.")
 
         value = self.parser(value)
