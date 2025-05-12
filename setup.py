@@ -19,7 +19,7 @@ setuptools.setup(
     description="A simple EDI 835 file format parser.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/keironstoddart/edi-835-parser",
+    url="https://github.com/CHS-CDS-AIML/edi-835-parser.git",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3.9",
