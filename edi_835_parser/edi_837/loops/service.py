@@ -52,8 +52,7 @@ class Service:
 
     @property
     def service_date(self) -> Optional[DateSegment]:
-        service_date = [d for d in self.dates if d.qualifier == "service"]
-        assert len(service_date) <= 1, f"{self.dates}"
+        service_date = [d for d in self.dates if d.code == "472"]
 
         if len(service_date) == 1:
             return service_date[0]
@@ -63,7 +62,7 @@ class Service:
         service_period_start = [
             d for d in self.dates #if d.qualifier == "service period start"
         ]
-        assert len(service_period_start) <= 1, f"{self.dates}"
+        #assert len(service_period_start) <= 1, f"{self.dates}"
 
         if len(service_period_start) == 1:
             return service_period_start[0]
@@ -75,7 +74,7 @@ class Service:
         service_period_end = [
             d for d in self.dates #if d.qualifier == "service period end"
         ]
-        assert len(service_period_end) <= 1
+        #assert len(service_period_end) <= 1
 
         if len(service_period_end) == 1:
             return service_period_end[0]
@@ -100,7 +99,6 @@ class Service:
 
                 elif identifier == DateSegment.identification:
                     date = DateSegment(segment)
-                    import pdb; pdb.set_trace()
                     service.dates.append(date)
 
                 elif identifier == AmountSegment.identification:

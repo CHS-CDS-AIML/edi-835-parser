@@ -56,7 +56,6 @@ class TransactionSet:
 
                         data.append(datum)
         df = pd.DataFrame(data)
-        import pdb; pdb.set_trace()
 
         return df
 
@@ -93,10 +92,28 @@ class TransactionSet:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
 
+        if provider is None:
+            billing_id_code = None
+        else:
+            billing_id_code = provider.provider.identification_code
+        if provider.name is None:
+            billing_provider = None
+        else:
+            billing_provider = provider.name.last_name
+        if provider.pay_to_provider is None:
+            ptp = None
+        else:
+            ptp = provider.pay_to_provider.last_name
+        if service.service is None:
+            charge_amount = None
+        else:
+            charge_amount = service.service.charge_amount
+
         datum = {
-            "billing_id_code": provider.provider.identification_code,
-            "billing_provider": provider.name.last_name,
-            "pay_to_provider": provider.pay_to_provider.last_name,
+            "patient_identifier": ea_code,
+            "billing_id_code": billing_id_code,
+            "billing_provider": billing_provider,
+            "pay_to_provider": ptp,
             "subscriber_responsibility": subscriber.subscriber.responsibility,
             "subscriber_relationship": subscriber.subscriber.relationship,
             "subscriber_group_number": subscriber.subscriber.group_number,
@@ -114,7 +131,7 @@ class TransactionSet:
             "claim_amount": claim.claim.claim_amount,
             "authorization_number": claim.authorization_number,
             "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
-            "charge_amount": service.service.charge_amount,
+            "charge_amount": charge_amount,
         }
 
         return datum
