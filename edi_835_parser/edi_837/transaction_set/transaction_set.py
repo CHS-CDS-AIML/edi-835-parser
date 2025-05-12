@@ -110,6 +110,7 @@ class TransactionSet:
             charge_amount = service.service.charge_amount
 
         datum = {
+            "patient_identifier": ea_code,
             "billing_id_code": billing_id_code,
             "billing_provider": billing_provider,
             "pay_to_provider": ptp,
