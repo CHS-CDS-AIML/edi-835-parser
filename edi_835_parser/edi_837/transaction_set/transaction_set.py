@@ -119,7 +119,7 @@ class TransactionSet:
             "subscriber_group_number": subscriber.subscriber.group_number,
             "subscriber_plan": subscriber.subscriber.plan,
             "subscriber_name": subscriber.patient.first_name + " " + subscriber.patient.last_name,
-            "subscriber_code_qualifer": subscriber.patient.identification_code_qualifier,
+            "subscriber_code_qualifier": subscriber.patient.identification_code_qualifier,
             "subscriber_code": subscriber.patient.identification_code,
             "subscriber_dob": str(subscriber.demographic.dob),
             # TODO: Get demographic
