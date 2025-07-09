@@ -96,10 +96,16 @@ class TransactionSet:
             billing_id_code = None
         else:
             billing_id_code = provider.provider.identification_code
+        # determine billing provider and npi
         if provider.name is None:
             billing_provider = None
+            billing_npi = None
         else:
             billing_provider = provider.name.last_name
+            if provider.name._identification_code_qualifier == "national provider id":
+                billing_npi = provider.name.identification_code
+            else:
+                billing_npi = None
         if provider.pay_to_provider is None:
             ptp = None
         else:
@@ -126,7 +132,7 @@ class TransactionSet:
             "subscriber_payer": subscriber.payer.last_name,
             "claim_rendering_provider": claim.rendering_provider,
             "facility": claim.facility.last_name if claim.facility else None,
-            "facility_npi": claim.facility.identification_code if claim.facility else None,
+            "facility_npi": billing_npi,
             "claim_identifier": claim.claim.claim_identifier,
             "claim_amount": claim.claim.claim_amount,
             "authorization_number": claim.authorization_number,
