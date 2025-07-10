@@ -53,7 +53,7 @@ class Payee:
                 else:
                     segment = None
                     message = f"Identifier: {identifier} not handled in payee loop."
-                    warn(message)
+                    #warn(message)
 
             except StopIteration:
                 return payee, None, None
