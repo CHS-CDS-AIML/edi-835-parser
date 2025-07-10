@@ -17,5 +17,5 @@ class Date(Element):
 			return datetime(year, month, day)
 
 		else:
-			warn(f'Unable to parse {value} into a datetime')
+			#warn(f'Unable to parse {value} into a datetime')
 			return value
