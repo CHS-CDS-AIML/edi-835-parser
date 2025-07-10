@@ -112,8 +112,10 @@ class TransactionSet:
             ptp = provider.pay_to_provider.last_name
         if service.service is None:
             charge_amount = None
+            charge_code = None
         else:
             charge_amount = service.service.charge_amount
+            charge_code = service.service.cpt
 
         datum = {
             "patient_identifier": ea_code,
@@ -137,6 +139,7 @@ class TransactionSet:
             "claim_amount": claim.claim.claim_amount,
             "authorization_number": claim.authorization_number,
             "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
+            "charge_code": charge_code,
             "charge_amount": charge_amount,
         }
 
