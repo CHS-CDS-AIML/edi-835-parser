@@ -119,7 +119,7 @@ class Subscriber:
                 else:
                     segment = None
                     message = f"Identifier: {identifier} not handled in provider loop."
-                    warn(message)
+                    #warn(message)
 
             except StopIteration:
                 return subscriber, None, None

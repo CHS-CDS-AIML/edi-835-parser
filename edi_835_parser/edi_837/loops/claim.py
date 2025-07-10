@@ -161,7 +161,7 @@ class Claim:
                 else:
                     segment = None
                     message = f"Identifier: {identifier} not handled in claim loop."
-                    warn(message)
+                    #warn(message)
 
             except StopIteration:
                 return claim, None, None

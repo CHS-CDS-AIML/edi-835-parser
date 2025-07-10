@@ -117,14 +117,14 @@ class Provider:
                 elif identifier in cls.terminating_identifiers:
                     if segment.split("*")[1] == "AT":
                         message = f"Identifier: {identifier} not handled in provider loop."
-                        warn(message)
+                        #warn(message)
                         segment = None
                     elif identifier == "HL":
                         if segment.split("*")[2] == cls.terminating_parent:
                             return provider, segments, segment
                         else:
                             message = f"identifier: {identifier} not handled in provider loop."
-                            warn(message)
+                            #warn(message)
                             segment = None
                     else:
                         return provider, segments, segment
@@ -132,7 +132,7 @@ class Provider:
                 else:
                     segment = None
                     message = f"Identifier: {identifier} not handled in provider loop."
-                    warn(message)
+                    #warn(message)
 
             except StopIteration:
                 return provider, None, None
