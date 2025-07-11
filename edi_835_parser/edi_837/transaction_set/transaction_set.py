@@ -133,8 +133,6 @@ class TransactionSet:
         else:
             policy_number = None
 
-        #if subscriber.patient.last_name == "RUGGABER":
-        #    import pdb; pdb.set_trace()
         datum = {
             "patient_identifier": ea_code,
             "billing_id_code": billing_id_code,
