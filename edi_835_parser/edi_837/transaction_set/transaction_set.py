@@ -94,7 +94,7 @@ class TransactionSet:
         for reference in claim.references:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
-            elif reference._qualifier.code == "X4":
+            elif reference._qualifier.code == "D9":
                 pa_number = reference.value
             elif reference._qualifier.code == "F8":
                 prior_claim = reference.value
@@ -154,7 +154,6 @@ class TransactionSet:
             "claim_identifier": claim.claim.claim_identifier,
             "prior_claim_identifier": prior_claim,
             "claim_amount": claim.claim.claim_amount,
-            "authorization_number": claim.authorization_number,
             "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
             "charge_code": charge_code,
             "charge_amount": charge_amount,
