@@ -94,7 +94,7 @@ class TransactionSet:
         for reference in claim.references:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
-            elif reference._qualifier.code == "X4":
+            elif reference._qualifier.code == "D9":
                 pa_number = reference.value
             elif reference._qualifier.code == "F8":
                 prior_claim = reference.value
