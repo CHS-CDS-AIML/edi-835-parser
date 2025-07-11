@@ -87,15 +87,24 @@ class TransactionSet:
             end_date = claim.claim_statement_period_end.date
             end_date_type = "claim_statement"
 
+        # get patient identifier and prior auth number
         ea_code = None
+        pa_number = None
+        prior_claim = None
         for reference in claim.references:
             if reference._qualifier.code == "EA":
                 ea_code = reference.value
+            elif reference._qualifier.code == "X4":
+                pa_number = reference.value
+            elif reference._qualifier.code == "F8":
+                prior_claim = reference.value
 
+        #determine billing id code
         if provider is None:
             billing_id_code = None
         else:
             billing_id_code = provider.provider.identification_code
+
         # determine billing provider and npi
         if provider.name is None:
             billing_provider = None
@@ -106,19 +115,31 @@ class TransactionSet:
                 billing_npi = provider.name.identification_code
             else:
                 billing_npi = None
+        # determine pay to provider
         if provider.pay_to_provider is None:
             ptp = None
         else:
             ptp = provider.pay_to_provider.last_name
+        # determine service charge and codes
         if service.service is None:
             charge_amount = None
+            charge_code = None
         else:
             charge_amount = service.service.charge_amount
+            charge_code = service.service.cpt
+        # determine policy number
+        if subscriber.patient._identification_code_qualifier == "member identification number":
+            policy_number = subscriber.patient.identification_code
+        else:
+            policy_number = None
 
         datum = {
             "patient_identifier": ea_code,
             "billing_id_code": billing_id_code,
             "billing_provider": billing_provider,
+            "facility_npi": billing_npi,
+            "prior_auth_number": pa_number,
+            "policy_number": policy_number,
             "pay_to_provider": ptp,
             "subscriber_responsibility": subscriber.subscriber.responsibility,
             "subscriber_relationship": subscriber.subscriber.relationship,
@@ -128,15 +149,14 @@ class TransactionSet:
             "subscriber_code_qualifier": subscriber.patient.identification_code_qualifier,
             "subscriber_code": subscriber.patient.identification_code,
             "subscriber_dob": str(subscriber.demographic.dob),
-            # TODO: Get demographic
             "subscriber_payer": subscriber.payer.last_name,
             "claim_rendering_provider": claim.rendering_provider,
-            "facility": claim.facility.last_name if claim.facility else None,
-            "facility_npi": billing_npi,
             "claim_identifier": claim.claim.claim_identifier,
+            "prior_claim_identifier": prior_claim,
             "claim_amount": claim.claim.claim_amount,
             "authorization_number": claim.authorization_number,
             "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
+            "charge_code": charge_code,
             "charge_amount": charge_amount,
         }
 
