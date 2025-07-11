@@ -151,7 +151,6 @@ class TransactionSet:
             "subscriber_code_qualifier": subscriber.patient.identification_code_qualifier,
             "subscriber_code": subscriber.patient.identification_code,
             "subscriber_dob": str(subscriber.demographic.dob),
-            # TODO: Get demographic
             "subscriber_payer": subscriber.payer.last_name,
             "claim_rendering_provider": claim.rendering_provider,
             "claim_identifier": claim.claim.claim_identifier,
