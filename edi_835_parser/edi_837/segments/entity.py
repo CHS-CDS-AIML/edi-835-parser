@@ -22,15 +22,15 @@ class Entity:
         try:
             self.identifier = segment[0]
         except IndexError:
-            self.identifier = ""
+            self.identifier = None
         try:
             self.entity = segment[1]
         except IndexError:
-            self.entity = ""
+            self.entity = None
         try:
             self.type = segment[2]
         except IndexError:
-            self.type = ""
+            self.type = None
         try:
             self.last_name = segment[3]
         except IndexError:
@@ -40,15 +40,15 @@ class Entity:
             if self.first_name is None:
                 self.first_name = ""
         except IndexError:
-            self.first_name = ""
+            self.first_name = None
         try:
             self.identification_code_qualifier = get_element(segment, 8)
         except IndexError:
-            self.identification_code_qualifier = ""
+            self.identification_code_qualifier = None
         try:
             self.identification_code = get_element(segment, 9)
         except IndexError:
-            self.identification_code = ""
+            self.identification_code = None
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
