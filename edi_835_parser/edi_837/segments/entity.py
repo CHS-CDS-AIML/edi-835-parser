@@ -37,6 +37,8 @@ class Entity:
             self.last_name = ""
         try:
             self.first_name = get_element(segment, 4)
+            if self.first_name is None:
+                self.first_name = ""
         except IndexError:
             self.first_name = ""
         try:
