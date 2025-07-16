@@ -17,7 +17,7 @@ class Location:
         try:
             self.zip_code = segment[3]
         except IndexError:
-            self.zip_code = None
+            self.zip_code = ""
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
