@@ -34,9 +34,11 @@ class Entity:
         try:
             self.last_name = segment[3]
         except IndexError:
-            self.last_name = None
+            self.last_name = ""
         try:
             self.first_name = get_element(segment, 4)
+            if self.first_name is None:
+                self.first_name = ""
         except IndexError:
             self.first_name = None
         try:

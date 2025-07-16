@@ -13,6 +13,9 @@ class DiagnosisCodes(Element):
             if len(code_split) == 1:
                 code_split = code_str.split(">")
             description = code_split[0]
-            element = code_split[1]
-            codes.append(Code(element, description))
+            try:
+                element = code_split[1]
+                codes.append(Code(element, description))
+            except IndexError:
+                pass
         return codes

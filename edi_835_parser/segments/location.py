@@ -3,22 +3,25 @@ from edi_835_parser.segments.utilities import split_segment
 
 
 class Location:
-	identification = 'N4'
+    identification = "N4"
 
-	identifier = Identifier()
+    identifier = Identifier()
 
-	def __init__(self, segment: str):
-		self.segment = segment
-		segment = split_segment(segment)
+    def __init__(self, segment: str):
+        self.segment = segment
+        segment = split_segment(segment)
 
-		self.identifier = segment[0]
-		self.city = segment[1]
-		self.state = segment[2]
-		self.zip_code = segment[3]
+        self.identifier = segment[0]
+        self.city = segment[1]
+        self.state = segment[2]
+        try:
+            self.zip_code = segment[3]
+        except IndexError:
+            self.zip_code = ""
 
-	def __repr__(self):
-		return '\n'.join(str(item) for item in self.__dict__.items())
+    def __repr__(self):
+        return "\n".join(str(item) for item in self.__dict__.items())
 
 
-if __name__ == '__main__':
-	pass
+if __name__ == "__main__":
+    pass
