@@ -30,6 +30,7 @@ class Claim:
         facility_value = claim_facility.parser(segment[8])
         self.claim_facility_code = facility_value.code
         self.claim_facility_desc = facility_value.description
+        self.claim_freq_type = segment[9]
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
