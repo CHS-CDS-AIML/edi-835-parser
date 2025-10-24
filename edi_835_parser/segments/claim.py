@@ -3,6 +3,7 @@ from edi_835_parser.elements.claim_status import ClaimStatus
 from edi_835_parser.elements.claim_facility import ClaimFacility
 from edi_835_parser.elements.dollars import Dollars
 from edi_835_parser.elements.claim_type import ClaimType
+from edi_835_parser.elements.claim_frequency import ClaimFrequencyCode
 from edi_835_parser.segments.utilities import split_segment
 
 
@@ -30,6 +31,10 @@ class Claim:
         facility_value = claim_facility.parser(segment[8])
         self.claim_facility_code = facility_value.code
         self.claim_facility_desc = facility_value.description
+        claim_frequency = ClaimFrequencyCode()
+        claim_frequency_value = claim_frequency.parser(segment[9])
+        self.claim_freq_type = claim_frequency_value.code
+        self.claim_freq_desc = claim_frequency_value.description
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
