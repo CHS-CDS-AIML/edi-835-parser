@@ -182,10 +182,10 @@ class TransactionSet:
             "claim_facility_desc": claim.claim.claim_facility_desc,
             "claim_freq_type": claim.claim.claim_freq_type,
             "claim_freq_desc": claim.claim.claim_freq_desc,
-            "claim_start_date": start_date,
-            "claim_end_date": end_date,
-            "claim_received_date": claim_received_date,
-            "claim_processed_date": processed_date.date,
+            "claim_start_date": start_date if start_date else None,
+            "claim_end_date": end_date if end_date else None,
+            "claim_received_date": claim_received_date if claim_received_date else None,
+            "claim_processed_date": processed_date.date if processed_date else None,
             "rendering_provider": (
                 claim.rendering_provider.name if claim.rendering_provider else None
             ),

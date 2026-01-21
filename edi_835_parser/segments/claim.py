@@ -33,7 +33,7 @@ class Claim:
             facility_value = claim_facility.parser(segment[8])
             self.claim_facility_code = facility_value.code
             self.claim_facility_desc = facility_value.description
-        except IndexError:
+        except (IndexError, ValueError):
             self.claim_facility_code = None
             self.claim_facility_desc = None
 
@@ -42,7 +42,7 @@ class Claim:
             claim_frequency_value = claim_frequency.parser(segment[9])
             self.claim_freq_type = claim_frequency_value.code
             self.claim_freq_desc = claim_frequency_value.description
-        except IndexError:
+        except (IndexError, ValueError):
             self.claim_freq_type = None
             self.claim_freq_desc = None
 
