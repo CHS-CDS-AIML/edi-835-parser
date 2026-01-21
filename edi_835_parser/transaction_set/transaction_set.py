@@ -268,7 +268,7 @@ class TransactionSet:
             "claim_start_date": claim_start_date,
             "claim_end_date": claim_end_date,
             "claim_received_date": claim_received_date,
-            "claim_processed_date": processed_date.date,
+            "claim_processed_date": processed_date.date if processed_date else None,
             "rendering_provider": (
                 claim.rendering_provider.name if claim.rendering_provider else None
             ),
