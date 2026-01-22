@@ -17,6 +17,16 @@ BuildAttributeResponse = namedtuple(
     "BuildAttributeResponse", "key value segment segments"
 )
 
+def safe_get(obj, *attrs):
+    """
+    A helper function to safely access nested attributes.
+    Returns None if any attribute in the chain is None.
+    """
+    for attr in attrs:
+        if obj is None:
+            return None
+        obj = getattr(obj, attr, None)
+    return obj
 
 class TransactionSet:
 
@@ -38,26 +48,6 @@ class TransactionSet:
 
     def __repr__(self):
         return "\n".join(str(item) for item in self.__dict__.items())
-
-    #@property
-    #def payer(self) -> OrganizationLoop:
-    #    payer = [o for o in self.organizations if o.organization.type == "payer"]
-    #    #assert len(payer) == 1
-    #    return payer[0]
-
-    #@property
-    #def payee(self) -> OrganizationLoop:
-    #    payee = [o for o in self.organizations if o.organization.type == "payee"]
-    #    if len(payee) != 1:
-    #        payee_list = []
-    #        for i in payee:
-    #            facility_npi = i.organization.identification_code
-    #            payee_list.append(facility_npi)
-    #        payee_list = list(set(payee_list))
-    #        # TODO: Determine if we need to handle these somehow
-    #        #if len(payee_list) > 1:
-    #        #    pass
-    #    return payee[0]
 
     def to_dataframe(self) -> pd.DataFrame:
         """flatten the remittance advice by service to a pandas DataFrame"""
@@ -114,7 +104,12 @@ class TransactionSet:
                     data.append(datum)
 
         df = pd.DataFrame(data)
-        df["transmission_date"] = str(self.interchange.transmission_date)
+
+        # Add a transmission date
+        try:
+            df["transmission_date"] = str(self.interchange.transmission_date)
+        except AttributeError:
+            df["transmission_date"] = None
 
         return df
 
@@ -158,39 +153,37 @@ class TransactionSet:
             facility_npi = None
 
         datum = {
-            "marker": claim.claim.marker,
+            "marker": safe_get(claim, "claim", "marker"),
             "patient_identifier": ea_code,
-            "patient": claim.patient.name,
-            "id_code_qualifier": claim.patient.identification_code_qualifier,
-            "id_code": claim.patient.identification_code,
+            "patient": safe_get(claim, "patient", "name"),
+            "id_code_qualifier": safe_get(claim, "patient", "identification_code_qualifier"),
+            "id_code": safe_get(claim, "patient", "identification_code"),
             "code": None,
             "modifier": None,
             "qualifier": None,
             "allowed_units": None,
             "billed_units": None,
             "transaction_date": financial_information.transaction_date,
-            "icn": claim.claim.icn,
-            "charge_amount": claim.claim.charge_amount,
+            "icn": safe_get(claim, "claim", "icn"),
+            "charge_amount": safe_get(claim, "claim", "charge_amount"),
             "allowed_amount": None,
-            "paid_amount": claim.claim.paid_amount,
-            "payer": organization.payer.name,
+            "paid_amount": safe_get(claim, "claim", "paid_amount"),
+            "payer": safe_get(organization, "payer", "name"),
             "start_date": None,
             "end_date": None,
-            "claim_status_code": claim.claim.status.code,
-            "claim_status_desc": claim.claim.status.description,
-            "claim_facility_code": claim.claim.claim_facility_code,
-            "claim_facility_desc": claim.claim.claim_facility_desc,
-            "claim_freq_type": claim.claim.claim_freq_type,
-            "claim_freq_desc": claim.claim.claim_freq_desc,
-            "claim_start_date": start_date,
-            "claim_end_date": end_date,
-            "claim_received_date": claim_received_date,
-            "claim_processed_date": processed_date.date,
-            "rendering_provider": (
-                claim.rendering_provider.name if claim.rendering_provider else None
-            ),
-            "payer_classification": str(claim.claim.status.payer_classification),
-            "was_forwarded": claim.claim.status.was_forwarded,
+            "claim_status_code": safe_get(claim, "claim", "status", "code"),
+            "claim_status_desc": safe_get(claim, "claim", "status", "description"),
+            "claim_facility_code": safe_get(claim, "claim", "claim_facility_code"),
+            "claim_facility_desc": safe_get(claim, "claim", "claim_facility_desc"),
+            "claim_freq_type": safe_get(claim, "claim", "claim_freq_type"),
+            "claim_freq_desc": safe_get(claim, "claim", "claim_freq_desc"),
+            "claim_start_date": start_date if start_date else None,
+            "claim_end_date": end_date if end_date else None,
+            "claim_received_date": claim_received_date if claim_received_date else None,
+            "claim_processed_date": processed_date.date if processed_date else None,
+            "rendering_provider": safe_get(claim, "rendering_provider", "name"),
+            "payer_classification": str(safe_get(claim, "claim", "status", "payer_classification")),
+            "was_forwarded": safe_get(claim, "claim", "status", "was_forwarded"),
             "facility_npi": facility_npi,
         }
 
@@ -241,41 +234,40 @@ class TransactionSet:
             facility_npi = None
 
         datum = {
-            "marker": claim.claim.marker,
+            "marker": safe_get(claim, "claim", "marker"),
             "patient_identifier": ea_code,
-            "patient": claim.patient.name,
-            "id_code_qualifier": claim.patient.identification_code_qualifier,
-            "id_code": claim.patient.identification_code,
-            "code": service.service.code,
-            "modifier": service.service.modifier,
-            "qualifier": service.service.qualifier,
-            "allowed_units": service.service.allowed_units,
-            "billed_units": service.service.billed_units,
-            "transaction_date": financial_information.transaction_date,
-            "icn": claim.claim.icn,
-            "charge_amount": service.service.charge_amount,
-            "allowed_amount": service.allowed_amount,
-            "paid_amount": service.service.paid_amount,
-            "payer": organization.payer.name,
+            "patient": safe_get(claim, "patient", "name"),
+            "id_code_qualifier": safe_get(claim, "patient", "identification_code_qualifier"),
+            "id_code": safe_get(claim, "patient", "identification_code"),
+            "code": safe_get(service, "service", "code"),
+            "modifier": safe_get(service, "service", "modifier"),
+            "qualifier": safe_get(service, "service", "qualifier"),
+            "allowed_units": safe_get(service, "service", "allowed_units"),
+            "billed_units": safe_get(service, "service", "billed_units"),
+            "transaction_date": safe_get(financial_information, "transaction_date"),
+            "icn": safe_get(claim, "claim", "icn"),
+            "charge_amount": safe_get(service, "service", "charge_amount"),
+            "allowed_amount": safe_get(service, "allowed_amount"),
+            "paid_amount": safe_get(service, "service", "paid_amount"),
+            "payer": safe_get(organization, "payer", "name"),
             "service_start_date": start_date,
             "service_end_date": end_date,
-            "claim_status_code": claim.claim.status.code,
-            "claim_status_desc": claim.claim.status.description,
-            "claim_facility_code": claim.claim.claim_facility_code,
-            "claim_facility_desc": claim.claim.claim_facility_desc,
-            "claim_freq_type": claim.claim.claim_freq_type,
-            "claim_freq_desc": claim.claim.claim_freq_desc,
+            "claim_status_code": safe_get(claim, "claim", "status", "code"),
+            "claim_status_desc": safe_get(claim, "claim", "status", "description"),
+            "claim_facility_code": safe_get(claim, "claim", "claim_facility_code"),
+            "claim_facility_desc": safe_get(claim, "claim", "claim_facility_desc"),
+            "claim_freq_type": safe_get(claim, "claim", "claim_freq_type"),
+            "claim_freq_desc": safe_get(claim, "claim", "claim_freq_desc"),
             "claim_start_date": claim_start_date,
             "claim_end_date": claim_end_date,
             "claim_received_date": claim_received_date,
-            "claim_processed_date": processed_date.date,
-            "rendering_provider": (
-                claim.rendering_provider.name if claim.rendering_provider else None
-            ),
-            "payer_classification": str(claim.claim.status.payer_classification),
-            "was_forwarded": claim.claim.status.was_forwarded,
+            "claim_processed_date": safe_get(processed_date, "date"),
+            "rendering_provider": safe_get(claim, "rendering_provider", "name"),
+            "payer_classification": str(safe_get(claim, "claim", "status", "payer_classification")),
+            "was_forwarded": safe_get(claim, "claim", "status", "was_forwarded"),
             "facility_npi": facility_npi,
         }
+
 
         return datum
 
@@ -324,6 +316,13 @@ class TransactionSet:
 
             if response.key == "claim":
                 claims.append(response.value)
+
+        # STOPGAP TO ADD CLAIMS
+        for org in organizations:
+            if org.claims:
+                claims.extend(org.claims)
+        #claims.extend(god_object.claims)
+        # STOPGAP TO ADD CLAIMS
 
         return TransactionSet(
             interchange, financial_information, processed_date, claims, organizations, file_path
