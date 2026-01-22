@@ -58,6 +58,8 @@ def test_to_dataframe(
     payment = blue_cross_nc_sample.sum_payments()
     blue_cross_nc_data = blue_cross_nc_sample.to_dataframe()
 
+    assert blue_cross_nc_data.shape[0] == 3
+
     assert payment == blue_cross_nc_data["paid_amount"].sum()
 
     blue_cross_nc_data.to_csv(f"{current_path}/output/blue_cross_nc_sample.csv")
@@ -65,12 +67,16 @@ def test_to_dataframe(
     payment = emedny_sample.sum_payments()
     emedny_data = emedny_sample.to_dataframe()
 
+    assert emedny_data.shape[0] == 10
+
     assert payment == emedny_data["paid_amount"].sum()
 
     emedny_data.to_csv(f"{current_path}/output/emedny_sample.csv")
 
     payment = united_healthcare_legacy_sample.sum_payments()
     united_healthcare_legacy_ = united_healthcare_legacy_sample.to_dataframe()
+
+    assert united_healthcare_legacy_.shape[0] == 5
 
     assert payment == united_healthcare_legacy_["paid_amount"].sum()
 
