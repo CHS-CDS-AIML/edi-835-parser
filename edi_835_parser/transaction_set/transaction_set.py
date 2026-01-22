@@ -104,7 +104,12 @@ class TransactionSet:
                     data.append(datum)
 
         df = pd.DataFrame(data)
-        df["transmission_date"] = str(self.interchange.transmission_date)
+
+        # Add a transmission date
+        try:
+            df["transmission_date"] = str(self.interchange.transmission_date)
+        except AttributeError:
+            df["transmission_date"] = None
 
         return df
 
@@ -311,6 +316,13 @@ class TransactionSet:
 
             if response.key == "claim":
                 claims.append(response.value)
+
+        # STOPGAP TO ADD CLAIMS
+        for org in organizations:
+            if org.claims:
+                claims.extend(org.claims)
+        #claims.extend(god_object.claims)
+        # STOPGAP TO ADD CLAIMS
 
         return TransactionSet(
             interchange, financial_information, processed_date, claims, organizations, file_path
