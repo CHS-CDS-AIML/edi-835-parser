@@ -166,7 +166,7 @@ class TransactionSet:
             "transaction_date": financial_information.transaction_date,
             "icn": safe_get(claim, "claim", "icn"),
             "charge_amount": safe_get(claim, "claim", "charge_amount"),
-            "allowed_amount": None,
+            "allowed_amount": safe_get(claim, "amount", "amount"),
             "paid_amount": safe_get(claim, "claim", "paid_amount"),
             "payer": safe_get(organization, "payer", "name"),
             "start_date": None,
@@ -205,6 +205,7 @@ class TransactionSet:
             start_date = service.service_period_start.date
         if claim.claim_statement_period_start:
             claim_start_date = claim.claim_statement_period_start.date
+
 
         # if the service doesn't have an end date assume the service and claim dates match
         end_date = None
