@@ -17,6 +17,17 @@ BuildAttributeResponse = namedtuple(
     "BuildAttributeResponse", "key value segment segments"
 )
 
+def safe_get(obj, *attrs):
+    """
+    A helper function to safely access nested attributes.
+    Returns None if any attribute in the chain is None.
+    """
+    for attr in attrs:
+        if obj is None:
+            return None
+        obj = getattr(obj, attr, None)
+    return obj
+
 
 class TransactionSet:
 
@@ -133,6 +144,13 @@ class TransactionSet:
         else:
             policy_number = None
 
+        # get dx codes
+        dx_codes = safe_get(claim, "diagnosis_codes", "diagnosis_codes")
+        if dx_codes:
+            code_dict = [{"code": i.code, "description": i.description} for i in dx_codes]
+        else:
+            code_dict = None
+
         datum = {
             "patient_identifier": ea_code,
             "billing_id_code": billing_id_code,
@@ -141,20 +159,20 @@ class TransactionSet:
             "prior_auth_number": pa_number,
             "policy_number": policy_number,
             "pay_to_provider": ptp,
-            "subscriber_responsibility": subscriber.subscriber.responsibility,
-            "subscriber_relationship": subscriber.subscriber.relationship,
-            "subscriber_group_number": subscriber.subscriber.group_number,
-            "subscriber_plan": subscriber.subscriber.plan,
-            "subscriber_name": subscriber.patient.first_name + " " + subscriber.patient.last_name,
-            "subscriber_code_qualifier": subscriber.patient.identification_code_qualifier,
-            "subscriber_code": subscriber.patient.identification_code,
-            "subscriber_dob": str(subscriber.demographic.dob),
-            "subscriber_payer": subscriber.payer.last_name,
-            "claim_rendering_provider": claim.rendering_provider,
-            "claim_identifier": claim.claim.claim_identifier,
+            "subscriber_responsibility": safe_get(subscriber, "subscriber", "responsibility"),
+            "subscriber_relationship": safe_get(subscriber, "subscriber", "relationship"),
+            "subscriber_group_number": safe_get(subscriber, "subscriber", "group_number"),
+            "subscriber_plan": safe_get(subscriber, "subscriber", "plan"),
+            "subscriber_name": safe_get(subscriber, "patient", "first_name") + " " + safe_get(subscriber, "patient", "last_name"),
+            "subscriber_code_qualifier": safe_get(subscriber, "patient", "identification_code_qualifier"),
+            "subscriber_code": safe_get(subscriber, "patient", "identification_code"),
+            "subscriber_dob": str(safe_get(subscriber, "demographic", "dob")),
+            "subscriber_payer": safe_get(subscriber, "payer", "last_name"),
+            "claim_rendering_provider": safe_get(claim, "rendering_provider"),
+            "claim_identifier": safe_get(claim, "claim", "claim_identifier"),
             "prior_claim_identifier": prior_claim,
-            "claim_amount": claim.claim.claim_amount,
-            "dx_codes": [{"code": i.code, "description": i.description} for i in claim.diagnosis_codes.diagnosis_codes],
+            "claim_amount": safe_get(claim, "claim", "claim_amount"),
+            "dx_codes": code_dict,
             "charge_code": charge_code,
             "charge_amount": charge_amount,
         }
