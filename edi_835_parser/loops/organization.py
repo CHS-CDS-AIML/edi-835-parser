@@ -25,12 +25,17 @@ class Organization:
         claims: List[ClaimLoop]  = None,
         payer: OrganizationSegment = None,
         payee: OrganizationSegment = None,
+        payer_address: AddressSegment = None,
+        payee_address: AddressSegment = None,
+        payer_location: LocationSegment = None,
+        payee_location: LocationSegment = None,
     ):
-        #self.organization = organization
         self.payee = payee
         self.payer = payer
-        self.location = location
-        self.address = address
+        self.payer_address = payer_address
+        self.payee_address = payee_address
+        self.payer_location = payer_location
+        self.payee_location = payee_location
         self.claims = claims if claims else []
 
     def __repr__(self):
@@ -42,14 +47,17 @@ class Organization:
     ) -> Tuple["OrganizationSegment", Optional[Iterator[str]], Optional[str]]:
         organization = Organization()
         #organization.organization = OrganizationSegment(current_segment)
+        last_identified_org = ''
         first_org = OrganizationSegment(current_segment)
         if first_org.type == "payer":
             organization.payer = first_org
             segment_terminating_identifier = "PR"
+            last_identified_org = "payer"
             other_org = "PE"
         else:
             organization.payee = first_org
             segment_terminating_identifier = "PE"
+            last_identified_org = "payee"
             other_org = "PR"
 
         segment = segments.__next__()
@@ -67,23 +75,33 @@ class Organization:
                         raise StopIteration
 
                 elif identifier == AddressSegment.identification:
-                    organization.address = AddressSegment(segment)
+                    #organization.address = AddressSegment(segment)
+                    #segment = None
+                    if last_identified_org == 'payer':
+                        organization.payer_address = AddressSegment(segment)
+                    elif last_identified_org == 'payee':
+                        organization.payee_address = AddressSegment(segment)
                     segment = None
 
                 elif identifier == LocationSegment.identification:
-                    organization.location = LocationSegment(segment)
+                    if last_identified_org == 'payer':
+                        organization.payer_location = LocationSegment(segment)
+                    elif last_identified_org == 'payee':
+                        organization.payee_location = LocationSegment(segment)
                     segment = None
                
                 elif identifier in cls.terminating_identifiers:
                     if identifier == "N1":
-                        if segment.split("*")[1] == other_org:
-                            if other_org == "PR":
-                                organization.payer = OrganizationSegment(segment)
-                                segment = None
-                            elif other_org == "PE":
-                                organization.payee = OrganizationSegment(segment)
-                                segment = None
-                        elif identifier == segment_terminating_identifier:
+                        org_segment = OrganizationSegment(segment)
+                        if org_segment.type == "payer":
+                            organization.payer = org_segment
+                            last_identified_org = 'payer'
+                            segment = None
+                        elif org_segment.type == "payee":
+                            organization.payee = org_segment
+                            last_identified_org = 'payee'
+                            segment = None
+                        else:
                             return organization, segments, segment
                     else:
                         return organization, segments, segment
