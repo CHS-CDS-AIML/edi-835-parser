@@ -256,13 +256,17 @@ class TransactionSet:
 
         # get payer address
         payer_address = safe_get(organization, "payer_address", "address")
-        payer_city = safe_get(organization, "payer_location", "city").capitalize()
+        payer_city = safe_get(organization, "payer_location", "city")
+        if payer_city:
+            payer_city = payer_city.capitalize()
         payer_state = safe_get(organization, "payer_location", "state")
         payer_zip = safe_get(organization, "payer_location", "zip_code")
 
         # get payee address
         payee_address = safe_get(organization, "payee_address", "address")
-        payee_city = safe_get(organization, "payee_location", "city").capitalize()
+        payee_city = safe_get(organization, "payee_location", "city")
+        if payee_city:
+            payee_city = payee_city.capitalize()
         payee_state = safe_get(organization, "payee_location", "state")
         payee_zip = safe_get(organization, "payee_location", "zip_code")
 
