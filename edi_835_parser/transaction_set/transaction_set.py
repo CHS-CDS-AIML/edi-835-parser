@@ -152,6 +152,18 @@ class TransactionSet:
         else:
             facility_npi = None
 
+        # get payer address
+        payer_address = safe_get(organization, "payer_address", "address")
+        payer_city = safe_get(organization, "payer_location", "city").capitalize()
+        payer_state = safe_get(organization, "payer_location", "state")
+        payer_zip = safe_get(organization, "payer_location", "zip_code")
+
+        # get payee address
+        payee_address = safe_get(organization, "payee_address", "address")
+        payee_city = safe_get(organization, "payee_location", "city").capitalize()
+        payee_state = safe_get(organization, "payee_location", "state")
+        payee_zip = safe_get(organization, "payee_location", "zip_code")
+
         datum = {
             "marker": safe_get(claim, "claim", "marker"),
             "patient_identifier": ea_code,
@@ -169,6 +181,14 @@ class TransactionSet:
             "allowed_amount": safe_get(claim, "amount", "amount"),
             "paid_amount": safe_get(claim, "claim", "paid_amount"),
             "payer": safe_get(organization, "payer", "name"),
+            "payer_address": payer_address,
+            "payer_city": payer_city,
+            "payer_state": payer_state,
+            "payer_zip": payer_zip,
+            "payee_address": payee_address,
+            "payee_city": payee_city,
+            "payee_state": payee_state,
+            "payee_zip": payee_zip,
             "start_date": None,
             "end_date": None,
             "claim_status_code": safe_get(claim, "claim", "status", "code"),
@@ -234,6 +254,23 @@ class TransactionSet:
         else:
             facility_npi = None
 
+        # get payer address
+        payer_address = safe_get(organization, "payer_address", "address")
+        payer_city = safe_get(organization, "payer_location", "city")
+        if payer_city:
+            payer_city = payer_city.capitalize()
+        payer_state = safe_get(organization, "payer_location", "state")
+        payer_zip = safe_get(organization, "payer_location", "zip_code")
+
+        # get payee address
+        payee_address = safe_get(organization, "payee_address", "address")
+        payee_city = safe_get(organization, "payee_location", "city")
+        if payee_city:
+            payee_city = payee_city.capitalize()
+        payee_state = safe_get(organization, "payee_location", "state")
+        payee_zip = safe_get(organization, "payee_location", "zip_code")
+
+
         datum = {
             "marker": safe_get(claim, "claim", "marker"),
             "patient_identifier": ea_code,
@@ -251,6 +288,14 @@ class TransactionSet:
             "allowed_amount": safe_get(service, "allowed_amount"),
             "paid_amount": safe_get(service, "service", "paid_amount"),
             "payer": safe_get(organization, "payer", "name"),
+            "payer_address": payer_address,
+            "payer_city": payer_city,
+            "payer_state": payer_state,
+            "payer_zip": payer_zip,
+            "payee_address": payee_address,
+            "payee_city": payee_city,
+            "payee_state": payee_state,
+            "payee_zip": payee_zip,
             "service_start_date": start_date,
             "service_end_date": end_date,
             "claim_status_code": safe_get(claim, "claim", "status", "code"),
