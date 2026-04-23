@@ -1,0 +1,35 @@
+steps:
+  # retrieve mcg_txt from gcs bucket
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'us-central1-docker.pkg.dev/prj-cdw-p-clndata-b8df/cloud-run-images/835-parser-image:latest', '.' ]
+  # push image to container registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'us-central1-docker.pkg.dev/prj-cdw-p-clndata-b8df/cloud-run-images/835-parser-image:latest' ]
+  # deploy image to cloud run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'edi-parser'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/prj-cdw-p-clndata-b8df/cloud-run-images/835-parser-image:latest'
+      - '--region'
+      - 'us-central1'
+      - '--ingress'
+      - 'internal'
+      - '--memory'
+      - '32Gi'
+      - '--cpu'
+      - '8'
+      - '--min-instances'
+      - '0'
+      - '--concurrency'
+      - '1'
+      - '--service-account'
+      - 'sa-p-cdw-cloudfunction@prj-cdw-p-clndata-b8df.iam.gserviceaccount.com'
+      - '--timeout'
+      - '3600'
+      - '--set-env-vars=PROJECT=prj-cdw-p-clndata-b8df'
+options:
+    logging: CLOUD_LOGGING_ONLY # Temporarily turn off logging
