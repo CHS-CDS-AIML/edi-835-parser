@@ -31,27 +31,20 @@ class ServiceAdjustment:
 
         # get the identifier (should be 'CAS')
         self.identifier = segment[0]
+        # get the group code
+        base_group_code = segment[1]
 
         # check how many CARC elements
         n_ele = len(segment)
 
-        for i in range(1, n_ele, 3):
-            # determine appropriate group code
-            if i == 1:
-                base_group_code = segment[i]
-
-            if segment[i] == '':
-                group_code = base_group_code
-            else:
-                group_code = segment[i]
-
+        for i in range(2, n_ele, 3):
             # get reason code and amount
-            reason_code = segment[i+1]
-            amount = segment[i+2]
+            reason_code = segment[i]
+            amount = segment[i+1]
 
             # set AdjustmentDetail
             carc = AdjustmentDetail(
-                    group_code=group_code,
+                    group_code=base_group_code,
                     reason_code=reason_code,
                     amount=amount,
                     )
