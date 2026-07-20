@@ -60,10 +60,21 @@ class TransactionSet:
                     )
                     datum["loop"] = "service"
 
-                    for index, adjustment in enumerate(service.adjustments):
-                        datum[f"adj_{index}_group"] = adjustment.group_code.code
-                        datum[f"adj_{index}_code"] = adjustment.reason_code.code
-                        datum[f"adj_{index}_amount"] = adjustment.amount
+                    counter = 0
+                    for adjustment in service.adjustments:
+                        if isinstance(adjustment.adjustments, list):
+                            for individual_adj in adjustment.adjustments:
+                                datum[f"adj_{counter}_group"] = individual_adj.group_code.code
+                                datum[f"adj_{counter}_code"] = individual_adj.reason_code.code
+                                datum[f"adj_{counter}_amount"] = individual_adj.amount
+
+                                counter += 1
+                        else:
+                            datum[f"adj_{counter}_group"] = adjustment.group_code.code
+                            datum[f"adj_{counter}_code"] = adjustment.reason_code.code
+                            datum[f"adj_{counter}_amount"] = adjustment.amount
+                            
+                            counter += 1
 
                     for index, reference in enumerate(service.references):
                         datum[f"ref_{index}_qual"] = reference.qualifier.code
@@ -81,19 +92,25 @@ class TransactionSet:
                     )
                     datum["loop"] = "claim"
 
-                    adjs = list()
                     rems = list()
+                    counter = 0
+                    # get claim CARCs
                     for index, adjustment in enumerate(claim.adjustments):
-                        #TODO: Figure out logic for actually passing in claim codes with amount. Right now just adding the common ones without amounts
-                        adjs.append((adjustment.group_code.code, adjustment.reason_code.code))
-                        #datum[f"adj_{index}_group"] = adjustment.group_code.code
-                        #datum[f"adj_{index}_code"] = adjustment.reason_code.code
-                        #datum[f"adj_{index}_amount"] = adjustment.amount
-                    adjs = list(set(adjs))
-                    for index, adjustment in enumerate(adjs):
-                        datum[f"adj_{index}_group"] = adjustment[0]
-                        datum[f"adj_{index}_code"] = adjustment[1]
+                        if isinstance(adjustment.adjustments, list):
+                            for individual_adj in adjustment.adjustments:
+                                datum[f"adj_{counter}_group"] = individual_adj.group_code.code
+                                datum[f"adj_{counter}_code"] = individual_adj.reason_code.code
+                                datum[f"adj_{counter}_amount"] = individual_adj.amount
 
+                                counter += 1
+                        else:
+                            datum[f"adj_{counter}_group"] = adjustment.group_code.code
+                            datum[f"adj_{counter}_code"] = adjustment.reason_code.code
+                            datum[f"adj_{counter}_amount"] = adjustment.amount
+                            
+                            counter += 1
+
+                    # get claim RARCs
                     for index, remark in enumerate(claim.remarks):
                         rems.append((remark.qualifier.code, remark.code.code))
                     rems = list(set(rems))
